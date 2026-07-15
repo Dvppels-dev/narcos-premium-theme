@@ -508,10 +508,8 @@ body::before {
 }
 
 .ng-call-button {
-  position: absolute !important;
+  position: static !important;
   z-index: 4;
-  top: 50%;
-  right: 340px;
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -524,7 +522,7 @@ body::before {
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(17,15,12,.97), rgba(53,39,18,.95) 58%, rgba(18,16,13,.98));
   box-shadow: 0 12px 30px rgba(201,152,67,.28), inset 0 1px rgba(255,255,255,.17), inset 0 -1px rgba(0,0,0,.56);
-  transform: translateY(-50%);
+  transform: none;
   font: 850 11px/1 inherit;
   letter-spacing: .06em;
   text-shadow: 0 1px 8px rgba(242,213,138,.28);
@@ -537,11 +535,11 @@ body::before {
 .ng-call-button:focus-visible {
   border-color: #fff0b1;
   box-shadow: 0 14px 34px rgba(201,152,67,.42), inset 0 1px rgba(255,255,255,.23), 0 0 0 3px rgba(242,213,138,.10);
-  transform: translateY(-50%) scale(1.025);
+  transform: translateY(-2px) scale(1.025);
 }
 
 .ng-call-button:active {
-  transform: translateY(-50%) scale(.96);
+  transform: scale(.96);
 }
 
 .ng-call-icon {
