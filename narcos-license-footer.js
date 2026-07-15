@@ -171,7 +171,7 @@
 
     var copy = document.createElement("div");
     copy.className = "ng-license-copy";
-    copy.appendChild(makeText("span", "ng-license-eyebrow", "LİSANS DOĞRULAMA"));
+    copy.appendChild(makeText("span", "ng-license-eyebrow", "DÜZENLEMELER VE İŞORTAKLARI"));
 
     var legal = document.createElement("p");
     legal.className = "ng-license-title";
