@@ -374,21 +374,22 @@ body::before {
     min-width: 0 !important;
   }
 
-  /* Masaustunde aksiyonlar once, logo + lisans rozeti en sagda kalsin. */
+  /* Masaustunde logo + lisans rozeti en solda, aksiyonlar en sagda kalsin. */
   [aria-label="site-header"] {
     display: flex !important;
     align-items: center !important;
   }
 
-  [aria-label="site-header"] [data-mj="header-center"] {
+  [aria-label="site-header"] [data-mj="header-left"] {
     order: 1 !important;
+    margin-left: 0 !important;
   }
 
-  [aria-label="site-header"] [data-mj="header-right"] {
+  [aria-label="site-header"] [data-mj="header-center"] {
     order: 2 !important;
   }
 
-  [aria-label="site-header"] [data-mj="header-left"] {
+  [aria-label="site-header"] [data-mj="header-right"] {
     order: 3 !important;
     margin-left: auto !important;
   }
@@ -1614,9 +1615,10 @@ footer::before {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
-    padding-right: 154px !important;
+    padding-left: 52px !important;
+    padding-right: 0 !important;
     box-sizing: border-box !important;
-    justify-content: flex-end !important;
+    justify-content: flex-start !important;
     align-items: center !important;
     pointer-events: none;
   }
