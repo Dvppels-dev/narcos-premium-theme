@@ -3792,3 +3792,129 @@ a:focus-visible span[style*="mask"] {
     animation: none !important;
   }
 }
+
+/* ---------------- SON DUZELTME: COMPACT MATCHES VE ICON HEADER ---------------- */
+/* Beni Ara desktop'ta da sadece ikon olarak kullanilsin. */
+.ng-call-button {
+  flex: 0 0 36px !important;
+  width: 36px !important;
+  height: 36px !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  border-radius: 11px !important;
+}
+
+.ng-call-label {
+  display: none !important;
+}
+
+.ng-call-icon {
+  flex: 0 0 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  padding: 3px !important;
+}
+
+/* Lisans badge PC ve mobilde kutusuz kalsin. */
+.ng-header-license {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 620px) {
+  /* Pages widget gorsellerinin dis cercevesini kaldir. */
+  [data-mj="widget-pages-item"] {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  /* Gunun Maclari kartlarini tek satirda tasirmadan kucuk ve okunur tut. */
+  [data-mj="widget-phoenix-sport"],
+  [data-mj="widget-phoenix-sport-container"],
+  [data-mj="widget-phoenix-sport-content"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  [data-mj="widget-phoenix-sport-content"] {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding-inline: 0 !important;
+  }
+
+  [data-mj="widget-phoenix-sport-content"] > *,
+  [data-mj="widget-phoenix-sport-content"] > div > * {
+    flex: 0 0 calc(100% - 18px) !important;
+    width: calc(100% - 18px) !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 18px) !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-mj="widget-phoenix-sport-content"] a {
+    min-height: 72px !important;
+    height: 72px !important;
+    padding: 7px 9px !important;
+    overflow: hidden !important;
+    border-radius: 11px !important;
+    font-size: 11px !important;
+    line-height: 1.14 !important;
+  }
+
+  [data-mj="widget-phoenix-sport-content"] a * {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    font-size: 11px !important;
+    line-height: 1.14 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  [data-mj="widget-phoenix-sport-header"] p,
+  [data-mj="widget-phoenix-sport-header"] a {
+    font-size: 13px !important;
+    line-height: 1 !important;
+  }
+
+  /* Sportsbook ilk boyamada kararmasin. */
+  [data-mj="page-content"]:has(#sportsbook-wrapper),
+  [data-mj="page-content"]:has(#sportsbook-wrapper) #sportsbook-wrapper,
+  [data-mj="page-content"]:has(#sportsbook-wrapper) #phoenix365ifraim {
+    opacity: 1 !important;
+    filter: none !important;
+    visibility: visible !important;
+    background-color: #0b0b0e !important;
+  }
+
+  /* Alt barin tamamini viewport'a kilitle; uzun promosyon etiketi sigsin. */
+  [data-mj="bottom-nav"] {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow: hidden !important;
+  }
+
+  [data-mj="bottom-nav"] > * {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] > span:last-child,
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] p {
+    font-size: 7.2px !important;
+    letter-spacing: -.025em !important;
+  }
+
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"]:nth-child(6) > span:last-child,
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"]:nth-child(6) p {
+    font-size: 6.2px !important;
+    letter-spacing: -.045em !important;
+  }
+}
