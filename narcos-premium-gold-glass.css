@@ -3918,3 +3918,43 @@ a:focus-visible span[style*="mask"] {
     letter-spacing: -.045em !important;
   }
 }
+
+/* ---------------- MOBIL SPORTSBOOK UST BOSLUK DUZELTMESI ---------------- */
+@media (max-width: 620px) {
+  #sportsbook-wrapper {
+    --ng-sportsbook-mobile-crop: 96px;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  #sportsbook-wrapper > iframe,
+  #sportsbook-wrapper iframe,
+  #phoenix365ifraim {
+    top: calc(-1 * var(--ng-sportsbook-mobile-crop)) !important;
+    right: 0 !important;
+    bottom: auto !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: calc(100% + var(--ng-sportsbook-mobile-crop)) !important;
+    min-height: calc(100% + var(--ng-sportsbook-mobile-crop)) !important;
+    transform: none !important;
+  }
+
+  [data-mj="page-content"]:has(#sportsbook-wrapper) {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] {
+    min-width: 0 !important;
+    padding-inline: 1px !important;
+    font-size: 7.1px !important;
+    letter-spacing: -.035em !important;
+  }
+
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"]:nth-child(6) {
+    flex-grow: 1.28 !important;
+    font-size: 6.2px !important;
+    letter-spacing: -.055em !important;
+  }
+}
