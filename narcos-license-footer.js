@@ -328,7 +328,15 @@
       });
     }
 
-    if (button.parentElement !== target) target.appendChild(button);
+    var loginButton = target.querySelector('[data-mj="login-button"]');
+    var loginWrap = loginButton && loginButton.parentElement;
+    if (loginWrap && loginWrap.parentElement === target) {
+      if (button.parentElement !== target || button.nextElementSibling !== loginWrap) {
+        target.insertBefore(button, loginWrap);
+      }
+    } else if (button.parentElement !== target) {
+      target.appendChild(button);
+    }
     return true;
   }
 
@@ -419,6 +427,12 @@
     return true;
   }
 
+  function removeCampaignLinks() {
+    var nav = document.getElementById("narcos-campaign-links");
+    if (nav) nav.remove();
+    return true;
+  }
+
   function markMobileSidebar() {
     var nav = document.querySelector('[data-mj="mobile-nav-list"]');
     if (!nav) return false;
@@ -472,7 +486,7 @@
     markMobileSidebar();
     localizeProviderSheet();
     installCampaignPage();
-    installCampaignLinks();
+    removeCampaignLinks();
     installFooterEnhancements();
   }
 
