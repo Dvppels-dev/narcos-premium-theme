@@ -205,6 +205,71 @@
     }
   }
 
+  function installMobileCallButton() {
+    var header = document.querySelector('[aria-label="site-header"]');
+    if (!header) return false;
+
+    var button = document.getElementById("narcos-call-button");
+    if (!button) {
+      button = document.createElement("button");
+      button.id = "narcos-call-button";
+      button.className = "ng-call-button";
+      button.type = "button";
+      button.setAttribute("aria-label", "Beni ara - canlı desteği aç");
+
+      var icon = makeText("span", "ng-call-icon", "☎");
+      icon.setAttribute("aria-hidden", "true");
+      button.appendChild(icon);
+      button.appendChild(makeText("span", "ng-call-label", "BENİ ARA"));
+
+      button.addEventListener("click", function () {
+        var supportButton = document.querySelector(
+          'button[aria-label="Sohbeti aç"], button[aria-label*="Sohbet"], button[aria-label*="sohbet"]'
+        );
+        if (supportButton) {
+          supportButton.click();
+          return;
+        }
+        window.open(TELEGRAM_URL, "_blank", "noopener,noreferrer");
+      });
+    }
+
+    if (button.parentElement !== header) header.appendChild(button);
+    return true;
+  }
+
+  function markMobileSidebar() {
+    var nav = document.querySelector('[data-mj="mobile-nav-list"]');
+    if (!nav) return false;
+
+    nav.classList.add("ng-sidebar-nav");
+    if (nav.parentElement) nav.parentElement.classList.add("ng-sidebar-scroll");
+
+    var node = nav.parentElement;
+    var drawer = null;
+    var fixedRoot = null;
+    var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+
+    while (node && node !== document.body) {
+      var rect = node.getBoundingClientRect();
+      var style = window.getComputedStyle(node);
+
+      if (rect.width >= 280 && rect.width < viewportWidth && rect.height > 500) {
+        drawer = node;
+      }
+
+      if (style.position === "fixed") {
+        fixedRoot = node;
+        break;
+      }
+      node = node.parentElement;
+    }
+
+    if (drawer) drawer.classList.add("ng-sidebar-drawer");
+    if (fixedRoot) fixedRoot.classList.add("ng-sidebar-root");
+    return true;
+  }
+
   function installFooterEnhancements() {
     var footerContent = document.querySelector('[data-mj="footer-content"]');
     var footer = document.querySelector("footer");
@@ -219,7 +284,13 @@
     return true;
   }
 
-  installFooterEnhancements();
+  function installInterfaceEnhancements() {
+    installMobileCallButton();
+    markMobileSidebar();
+    installFooterEnhancements();
+  }
+
+  installInterfaceEnhancements();
 
   var scheduled = false;
   var observer = new MutationObserver(function () {
@@ -227,7 +298,7 @@
     scheduled = true;
     window.requestAnimationFrame(function () {
       scheduled = false;
-      installFooterEnhancements();
+      installInterfaceEnhancements();
     });
   });
 
