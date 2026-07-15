@@ -28,10 +28,13 @@ body,
 
 body {
   color: var(--ng-text) !important;
-  background:
-    radial-gradient(circle at 8% 4%, rgba(201, 152, 67, 0.18), transparent 30rem),
-    radial-gradient(circle at 94% 20%, rgba(143, 100, 36, 0.13), transparent 34rem),
-    linear-gradient(145deg, #070708 0%, #111114 52%, #09090b 100%) !important;
+  background-color: #070708 !important;
+  background-image:
+    linear-gradient(180deg, rgba(5,5,7,.18) 0%, rgba(7,7,9,.46) 56%, rgba(7,7,8,.78) 100%),
+    url("./narcos-premium-background.png") !important;
+  background-position: center top, center top !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-size: cover, cover !important;
   background-attachment: fixed !important;
 }
 
@@ -53,8 +56,10 @@ main {
   border-bottom: 1px solid rgba(242, 213, 138, .26);
   background:
     radial-gradient(circle at 50% -80%, rgba(242, 213, 138, .15), transparent 66%),
-    linear-gradient(110deg, rgba(17,17,20,.98), rgba(35,31,24,.96), rgba(17,17,20,.98)) !important;
+    linear-gradient(110deg, rgba(10,10,13,.72), rgba(35,31,24,.58), rgba(10,10,13,.72)) !important;
   box-shadow: inset 0 -1px rgba(255,255,255,.025), 0 8px 24px rgba(0,0,0,.20);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
 }
 
 [data-mj="announcement"] > div {
@@ -146,13 +151,41 @@ body::before {
 }
 
 /* ---------------- HEADER ---------------- */
+[data-mj="header"] {
+  height: auto !important;
+  min-height: max-content !important;
+  overflow: visible !important;
+  background:
+    linear-gradient(180deg, rgba(7,8,12,.66), rgba(12,12,17,.42)) !important;
+  border-bottom: 1px solid rgba(242,213,138,.34) !important;
+  box-shadow: 0 12px 34px rgba(0,0,0,.30) !important;
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+}
+
+[data-mj="custom-header"] {
+  min-height: 64px !important;
+  overflow: visible !important;
+  background: rgba(10,10,14,.28) !important;
+}
+
 [aria-label="site-header"] {
   isolation: isolate;
-  background: linear-gradient(110deg, rgba(20, 20, 24, .88), rgba(35, 32, 27, .72)) !important;
+  overflow: visible !important;
+  background: linear-gradient(110deg, rgba(18,18,23,.46), rgba(38,33,26,.30)) !important;
   border-bottom: 1px solid var(--ng-line) !important;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, .38), inset 0 1px rgba(255, 255, 255, .06) !important;
+  box-shadow: 0 10px 35px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.055) !important;
   backdrop-filter: blur(18px) saturate(135%);
   -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+
+[data-mj="header-nav"] {
+  min-height: 56px !important;
+  overflow: visible !important;
+  background: rgba(18,18,24,.42) !important;
+  border-bottom: 1px solid rgba(242,213,138,.16) !important;
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
 }
 
 [aria-label="site-header"]::after {
@@ -230,7 +263,8 @@ body::before {
   }
 
   [data-mj="header-nav-list"] {
-    overflow: hidden !important;
+    min-height: 40px !important;
+    overflow: visible !important;
   }
 
   [data-mj="header-nav-list"] > ul {
