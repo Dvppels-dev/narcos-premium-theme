@@ -489,6 +489,58 @@
     return true;
   }
 
+  function installFooterNavigationColumns() {
+    var footerTop = document.querySelector('[data-mj="footer-top"]');
+    var sourceNav = footerTop && footerTop.querySelector('[data-mj="footer-nav"]');
+    if (!footerTop || !sourceNav) return false;
+
+    sourceNav.hidden = true;
+    sourceNav.setAttribute("aria-hidden", "true");
+    sourceNav.style.setProperty("display", "none", "important");
+
+    var columns = footerTop.querySelector("#narcos-footer-columns");
+    if (!columns) {
+      columns = document.createElement("div");
+      columns.id = "narcos-footer-columns";
+      footerTop.appendChild(columns);
+    }
+
+    if (columns.getAttribute("data-ng-version") === "1") return true;
+
+    var links = sourceNav.querySelectorAll("a");
+    var groups = [
+      { title: "HAKKIMIZDA", hrefs: ["/tr/ha", "/tr/sorumlu"] },
+      { title: "YÖNETMELİK", hrefs: ["/tr/genel", "/tr/gizlilik", "/tr/sorular", "/tr/kyc"] },
+      { title: "YARDIM", hrefs: ["/tr/iptal", "/tr/finansal", "/tr/karaparaaklama", "/tr/adalet"] },
+      { title: "MOBİL UYGULAMA", hrefs: [] }
+    ];
+
+    columns.textContent = "";
+    for (var i = 0; i < groups.length; i++) {
+      var group = groups[i];
+      var column = document.createElement("section");
+      column.className = "ng-footer-column";
+      column.appendChild(makeText("h3", "ng-footer-column-title", group.title));
+
+      for (var j = 0; j < links.length; j++) {
+        var href = links[j].getAttribute("href") || "";
+        if (group.hrefs.indexOf(href) >= 0) {
+          var clone = links[j].cloneNode(true);
+          clone.className = "ng-footer-column-link";
+          column.appendChild(clone);
+        }
+      }
+
+      if (!group.hrefs.length) {
+        column.appendChild(makeText("span", "ng-footer-column-note", "Yakında"));
+      }
+      columns.appendChild(column);
+    }
+
+    columns.setAttribute("data-ng-version", "1");
+    return true;
+  }
+
   function installFooterEnhancements() {
     var footerContent = document.querySelector('[data-mj="footer-content"]');
     var footer = document.querySelector("footer");
@@ -509,6 +561,7 @@
     installMobileCallButton();
     markMobileSidebar();
     markLeagueWidget();
+    installFooterNavigationColumns();
     localizeProviderSheet();
     installCampaignPage();
     removeCampaignLinks();
