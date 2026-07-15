@@ -334,7 +334,7 @@
 
   function getCampaignRoute() {
     var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
-    var slug = path.slice(path.lastIndexOf("/") + 1);
+    var slug = path.slice(path.lastIndexOf("/") + 1).replace(/\.(html?|php)$/, "");
     if (["vip", "vip-basvuru", "vip-basvurusu"].indexOf(slug) >= 0) return "vip";
     if (["beni-ara", "beniara", "call", "contact"].indexOf(slug) >= 0) return "call";
     if (["milyonerler", "millionaires", "millionaire"].indexOf(slug) >= 0) return "millionaires";
