@@ -146,7 +146,12 @@ body::before {
 /* ---------------- FOOTER: GREY + GOLD ---------------- */
 footer {
   position: relative;
-  overflow: hidden;
+  /* Platformun footer'a verdigi yuzdelik yukseklik icerigi 80px'e
+     sikistiriyordu. Icerik kadar buyumesini ve kesilmemesini zorla. */
+  height: auto !important;
+  min-height: max-content !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
   padding: 52px 20px 28px !important;
   color: var(--ng-text) !important;
   border-top: 1px solid rgba(242, 213, 138, .34) !important;
@@ -371,6 +376,9 @@ footer::before {
   }
 
   footer {
+    height: auto !important;
+    min-height: max-content !important;
+    overflow: visible !important;
     padding: 34px 14px 84px !important;
   }
 
