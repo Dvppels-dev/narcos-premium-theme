@@ -1155,6 +1155,12 @@ footer::before {
     white-space: nowrap !important;
   }
 
+  [data-mj="bottom-nav"] > * > div {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
   [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] > span:first-child {
     display: block !important;
     flex: 0 0 22px !important;
