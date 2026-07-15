@@ -714,6 +714,59 @@ body::before {
 }
 
 @media (max-width: 620px) {
+  /* Mobilde uygulama kökünün 100% yüksekliğe kilitlenmesi, footer'ın uzunluğu
+     nedeniyle main alanını 32px'e kadar daraltabiliyor. İçeriği doğal akışa bırak. */
+  html,
+  body {
+    height: auto !important;
+    min-height: 100% !important;
+  }
+
+  #root {
+    height: auto !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  main[data-mj="page-content"] {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Yan/çoklu bannerlar kartın doğal oranını korusun; dar ekranda kırpılmasın. */
+  [data-mj="widget-multi-banner"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-inline: 12px !important;
+  }
+
+  [data-mj="widget-multi-banner-slider"] {
+    width: 100% !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 5 !important;
+    height: auto !important;
+  }
+
+  [data-mj="widget-multi-banner-slider"] > * {
+    height: 100% !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+  }
+
+  [data-mj="widget-multi-banner-slider"] img,
+  [data-mj="widget-multi-banner-slider"] picture,
+  [data-mj="widget-multi-banner-slider"] picture img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
   html,
   body,
   #root,
@@ -931,6 +984,43 @@ footer::before {
 
   #narcos-license-banner .ng-license-title {
     font-size: 10px !important;
+  }
+
+  /* React kökünün viewport yüksekliği footer tarafından sıkıştırılmasın. */
+  html,
+  body {
+    height: auto !important;
+  }
+
+  #root {
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+
+  main[data-mj="page-content"] {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  [data-mj="widget-multi-banner-item"] {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  [data-mj="widget-multi-banner-slider"] {
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 5 !important;
+  }
+
+  [data-mj="widget-multi-banner-slider"] img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
 }
 
@@ -2891,6 +2981,26 @@ footer::before {
   .ng-leagues-widget {
     --ng-league-card-width: 148px !important;
   }
+}
+
+/* Header'daki GIF/promosyon butonunu premium altın gradyana taşı. */
+[data-mj="header-special-button"] {
+  color: #17130b !important;
+  border: 1px solid rgba(255, 242, 189, .78) !important;
+  background-image: none !important;
+  background: linear-gradient(135deg, #9b6a1b 0%, #d6a63d 38%, #fff0ae 64%, #c78c27 100%) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.58), 0 8px 24px rgba(201,152,67,.30) !important;
+}
+
+[data-mj="header-special-button"] img,
+[data-mj="header-special-button"] [role="img"] {
+  filter: brightness(.26) saturate(.9) contrast(1.2) !important;
+}
+
+[data-mj="header-special-button"]:hover,
+[data-mj="header-special-button"]:focus-visible {
+  background: linear-gradient(135deg, #b77b1e 0%, #ffe99d 58%, #d39a2f 100%) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.72), 0 12px 30px rgba(201,152,67,.46) !important;
 }
 
 footer {
