@@ -217,6 +217,42 @@ body::before {
   filter: drop-shadow(0 5px 14px rgba(201, 152, 67, .22));
 }
 
+[data-mj="header-left"] {
+  gap: 8px !important;
+}
+
+.ng-header-license {
+  position: relative;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  padding: 3px;
+  box-sizing: border-box;
+  pointer-events: auto;
+  border: 1px solid rgba(242,213,138,.52);
+  border-radius: 11px;
+  background: linear-gradient(145deg, rgba(255,255,255,.10), rgba(201,152,67,.16));
+  box-shadow: inset 0 1px rgba(255,255,255,.14), 0 7px 18px rgba(201,152,67,.20);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.ng-header-license:hover,
+.ng-header-license:focus-visible {
+  border-color: var(--ng-gold-4);
+  box-shadow: 0 10px 24px rgba(201,152,67,.34), 0 0 0 3px rgba(242,213,138,.10);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.ng-header-license-image {
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
 [data-mj="login-button"],
 [data-mj="register-button"],
 [data-mj="header-special-button"] {
@@ -595,6 +631,191 @@ body::before {
   object-fit: cover !important;
 }
 
+/* ---------------- MOBILE PROVIDER SHEET ---------------- */
+@media (max-width: 620px) {
+  [data-mj="game-catalog-provider-bottom-sheet-content"] {
+    width: 100% !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(242,213,138,.45) !important;
+    border-bottom: 0 !important;
+    border-radius: 24px 24px 0 0 !important;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(201,152,67,.20), transparent 22rem),
+      linear-gradient(145deg, rgba(35,31,25,.98), rgba(8,8,11,.99) 68%) !important;
+    box-shadow: 0 -18px 48px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.10) !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-header"] {
+    min-height: 58px !important;
+    padding: 15px 18px 9px !important;
+    color: var(--ng-gold-3) !important;
+    border-bottom: 1px solid rgba(242,213,138,.18) !important;
+    background: linear-gradient(90deg, rgba(201,152,67,.14), transparent 72%) !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-header"]::before {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 4px;
+    margin: -4px auto 10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--ng-gold-2), var(--ng-gold-4));
+    box-shadow: 0 0 12px rgba(242,213,138,.36);
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-header"] p {
+    margin: 0 !important;
+    text-align: center !important;
+    color: var(--ng-gold-4) !important;
+    font-size: 16px !important;
+    font-weight: 850 !important;
+    letter-spacing: .06em !important;
+    text-transform: uppercase !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-body"] {
+    padding: 12px 14px 18px !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-body"] > div:first-child {
+    margin: 0 0 11px !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-body"] > div:first-child > div {
+    min-height: 44px !important;
+    border: 1px solid rgba(242,213,138,.22) !important;
+    border-radius: 13px !important;
+    background: rgba(7,7,9,.65) !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.06) !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-search"] {
+    min-height: 42px !important;
+    padding: 0 12px !important;
+    color: #fff !important;
+    background: transparent !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-body"] [role="img"] {
+    color: var(--ng-gold-3) !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-sort"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    margin: 0 0 10px !important;
+    padding: 4px !important;
+    border: 1px solid rgba(242,213,138,.14) !important;
+    border-radius: 12px !important;
+    background: rgba(255,255,255,.035) !important;
+  }
+
+  [data-mj="game-catalog-provider-sort-popular"],
+  [data-mj="game-catalog-provider-sort-az"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 1 0 !important;
+    min-height: 32px !important;
+    border-radius: 8px !important;
+    color: rgba(255,255,255,.68) !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: .05em !important;
+    text-transform: uppercase !important;
+  }
+
+  [data-mj="game-catalog-provider-sort-popular"] {
+    color: #17130b !important;
+    background: linear-gradient(120deg, #c68c28, #ffe99d 58%, #b77b1e) !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.52) !important;
+  }
+
+  [data-mj="game-catalog-provider-sort-az"] {
+    gap: 5px !important;
+  }
+
+  [data-mj="game-catalog-provider-sort-az"] [role="img"] {
+    color: var(--ng-gold-3) !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-list"] {
+    max-height: calc(80dvh - 166px) !important;
+    padding: 2px !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ng-gold-2) rgba(255,255,255,.06);
+  }
+
+  [data-mj="game-catalog-provider-list"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  [data-mj="game-catalog-provider-list"] > div {
+    margin: 0 !important;
+    min-width: 0 !important;
+  }
+
+  [data-mj="game-catalog-provider-item"] {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 58px !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+    border: 1px solid rgba(242,213,138,.14) !important;
+    border-radius: 12px !important;
+    background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.018)) !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.05), 0 7px 16px rgba(0,0,0,.22) !important;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease !important;
+  }
+
+  [data-mj="game-catalog-provider-item"]:active,
+  [data-mj="game-catalog-provider-item"]:focus-within {
+    border-color: rgba(242,213,138,.72) !important;
+    background: linear-gradient(145deg, rgba(201,152,67,.20), rgba(255,255,255,.025)) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  [data-mj="game-catalog-provider-item"] > div:first-child {
+    display: grid !important;
+    place-items: center !important;
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    height: 36px !important;
+    border: 1px solid rgba(242,213,138,.18) !important;
+    border-radius: 9px !important;
+    background: rgba(7,7,9,.70) !important;
+  }
+
+  [data-mj="game-catalog-provider-item"] > div:first-child img {
+    width: 30px !important;
+    height: 24px !important;
+    object-fit: contain !important;
+  }
+
+  [data-mj="game-catalog-provider-item"] > div:last-child {
+    min-width: 0 !important;
+  }
+
+  [data-mj="game-catalog-provider-item"] p {
+    overflow: hidden !important;
+    margin: 0 !important;
+    color: rgba(255,255,255,.88) !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+    line-height: 1.15 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+}
+
 /* ---------------- FOOTER: GREY + GOLD ---------------- */
 footer {
   position: relative;
@@ -640,7 +861,8 @@ footer::before {
 [data-mj="footer-content"] > hr,
 #narcos-values-panel,
 #narcos-social-panel,
-#narcos-license-banner {
+#narcos-license-banner,
+#narcos-contact-button {
   grid-column: 1 / -1 !important;
   width: 100% !important;
   min-width: 0 !important;
@@ -908,6 +1130,53 @@ footer::before {
 
 .ng-social-card:hover .ng-social-arrow {
   transform: translate(2px, -2px);
+}
+
+.ng-contact-button {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 2px auto 0;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  color: #17130b !important;
+  text-decoration: none !important;
+  border: 1px solid rgba(255,242,189,.78);
+  border-radius: 999px;
+  background: linear-gradient(120deg, #b77b1e, #ffe99d 55%, #c68c28);
+  box-shadow: inset 0 1px rgba(255,255,255,.62), 0 10px 24px rgba(201,152,67,.24);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.ng-contact-button:hover,
+.ng-contact-button:focus-visible {
+  filter: brightness(1.08);
+  box-shadow: inset 0 1px rgba(255,255,255,.78), 0 14px 32px rgba(201,152,67,.38), 0 0 0 3px rgba(242,213,138,.10);
+  transform: translateY(-2px);
+}
+
+.ng-contact-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--ng-gold-3);
+  border-radius: 50%;
+  background: rgba(17,15,12,.92);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.ng-contact-copy {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---------------- LISANS BANDI ---------------- */
@@ -1484,6 +1753,27 @@ footer::before {
 
   .ng-social-title {
     font-size: 16px;
+  }
+
+  .ng-header-license {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    padding: 2px;
+    border-radius: 10px;
+  }
+
+  .ng-header-license-image {
+    width: 32px;
+    height: 32px;
+  }
+
+  .ng-contact-button {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 14px;
+    font-size: 11px;
+    letter-spacing: .025em;
   }
 
   #narcos-license-banner .ng-license-panel {

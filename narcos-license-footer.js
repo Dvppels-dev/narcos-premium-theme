@@ -226,6 +226,51 @@
     }
   }
 
+  function installHeaderLicenseBadge() {
+    var headerLeft = document.querySelector('[aria-label="site-header"] [data-mj="header-left"]');
+    var logo = headerLeft && headerLeft.querySelector('[data-mj="logo"]');
+    if (!headerLeft || !logo) return false;
+
+    var badgeLink = document.getElementById("narcos-header-license");
+    if (!badgeLink) {
+      badgeLink = makeExternalLink(
+        VERIFY_URL,
+        "ng-header-license",
+        "",
+        "Anjouan Gaming lisansını doğrula"
+      );
+      badgeLink.id = "narcos-header-license";
+
+      var badge = document.createElement("img");
+      badge.className = "ng-header-license-image";
+      badge.src = LICENSE_BADGE_URL;
+      badge.alt = "Anjouan Gaming lisans rozeti";
+      badge.width = 42;
+      badge.height = 42;
+      badge.loading = "lazy";
+      badgeLink.appendChild(badge);
+    }
+
+    if (badgeLink.parentElement !== headerLeft) headerLeft.appendChild(badgeLink);
+    return true;
+  }
+
+  function installContactButton(target) {
+    var button = document.getElementById("narcos-contact-button");
+    if (!button) {
+      button = document.createElement("a");
+      button.id = "narcos-contact-button";
+      button.className = "ng-contact-button";
+      button.href = "mailto:destek@narcosbahis.com";
+      button.setAttribute("aria-label", "NarcosBahis destek e-posta adresine ulaşın");
+      button.appendChild(makeText("span", "ng-contact-icon", "✉"));
+      button.appendChild(makeText("span", "ng-contact-copy", "BİZE ULAŞIN: destek@narcosbahis.com"));
+    }
+
+    if (button.parentElement !== target) target.appendChild(button);
+    return button;
+  }
+
   function installMobileCallButton() {
     var header = document.querySelector('[aria-label="site-header"]');
     if (!header) return false;
@@ -305,12 +350,14 @@
     var licenseBanner = installLicenseBanner(target);
     var socialPanel = installSocialPanel(target, licenseBanner);
     installValuesPanel(target, socialPanel);
+    installContactButton(target);
     markAgeBadge(footer);
     updateExistingTelegramLink(footer);
     return true;
   }
 
   function installInterfaceEnhancements() {
+    installHeaderLicenseBadge();
     installMobileCallButton();
     markMobileSidebar();
     installFooterEnhancements();
