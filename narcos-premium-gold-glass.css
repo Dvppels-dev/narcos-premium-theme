@@ -3277,3 +3277,180 @@ footer::before {
     animation: none !important;
   }
 }
+
+/* ---------------- SON MOBIL POLISH ---------------- */
+@media (max-width: 620px) {
+  html {
+    scroll-behavior: smooth !important;
+  }
+
+  /* Slider karti dar ekranlarda dikey olarak da nefes alsin; gorsel kenarlardan kirpilmasin. */
+  [data-mj="widget-multi-banner-slider"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 16 / 7 !important;
+    height: auto !important;
+  }
+
+  [data-mj="widget-multi-banner-slider"] > *,
+  [data-mj="widget-multi-banner-slider"] img,
+  [data-mj="widget-multi-banner-slider"] picture,
+  [data-mj="widget-multi-banner-slider"] picture img {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  [data-mj="widget-multi-banner-slider"] > * {
+    flex: 0 0 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  [data-mj="widget-multi-banner-slider"] img,
+  [data-mj="widget-multi-banner-slider"] picture img {
+    display: block !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    background: #0b0b0d !important;
+  }
+
+  /* Beni Ara basligi diger header butonlariyla ayni font ritminde ve her ekranda gorunur. */
+  .ng-call-button,
+  .ng-call-button .ng-call-label {
+    font-family: inherit !important;
+    font-style: normal !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    letter-spacing: .01em !important;
+    text-transform: none !important;
+  }
+
+  .ng-call-button {
+    flex: 0 0 78px !important;
+    width: 78px !important;
+    height: 34px !important;
+    gap: 5px !important;
+    padding: 0 8px !important;
+  }
+
+  .ng-call-label {
+    display: inline-block !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+  }
+
+  .ng-call-icon {
+    flex: 0 0 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    padding: 3px !important;
+  }
+
+  [data-mj="header-right"] {
+    gap: 3px !important;
+  }
+
+  /* Sidebar tek ekranda, ortali ve kaydirma cubugu olmadan acilsin. */
+  .ng-sidebar-drawer {
+    top: 9px !important;
+    bottom: 9px !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .ng-sidebar-scroll {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    scrollbar-width: none !important;
+  }
+
+  .ng-sidebar-scroll::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+  }
+
+  [data-mj="mobile-nav-list"].ng-sidebar-nav {
+    width: calc(100% - 18px) !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    padding: 7px !important;
+  }
+
+  [data-mj="mobile-nav-list"].ng-sidebar-nav > ul {
+    gap: 4px !important;
+  }
+
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] > :is(a, div, span),
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] > div a {
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 5px 10px !important;
+    border-radius: 10px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    letter-spacing: .025em !important;
+  }
+
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] > div,
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] > div > div {
+    min-height: 38px !important;
+    height: 38px !important;
+  }
+
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a {
+    gap: 9px !important;
+    overflow: visible !important;
+  }
+
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] span[style*="mask-image"],
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] span[style*="mask"] {
+    opacity: 1 !important;
+    filter: none !important;
+    background-color: var(--ng-gold-3) !important;
+  }
+
+  /* Dokunma/focus durumunda ikon ve metin soluklasmasin. */
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:active,
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:focus-visible,
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a[aria-current="page"],
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"]:active,
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"]:focus-visible {
+    color: var(--ng-gold-3) !important;
+    opacity: 1 !important;
+  }
+
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:active span,
+  [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:focus-visible span,
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"]:active > span:first-child,
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"]:focus-visible > span:first-child {
+    opacity: 1 !important;
+    filter: none !important;
+    background-color: var(--ng-gold-3) !important;
+    color: var(--ng-gold-3) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .ng-call-button {
+    flex-basis: 74px !important;
+    width: 74px !important;
+    gap: 4px !important;
+    padding-inline: 6px !important;
+  }
+
+  .ng-call-label {
+    display: inline-block !important;
+    font-size: 10px !important;
+  }
+
+  [data-mj="login-button"] {
+    min-width: 44px !important;
+    padding-inline: 6px !important;
+  }
+}

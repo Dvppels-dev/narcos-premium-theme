@@ -314,7 +314,7 @@
       icon.height = 24;
       icon.setAttribute("aria-hidden", "true");
       button.appendChild(icon);
-      button.appendChild(makeText("span", "ng-call-label", "BENİ ARA"));
+      button.appendChild(makeText("span", "ng-call-label", "Beni Ara"));
 
       button.addEventListener("click", function () {
         var supportButton = document.querySelector(
