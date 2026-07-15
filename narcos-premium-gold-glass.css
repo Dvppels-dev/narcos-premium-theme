@@ -3536,8 +3536,10 @@ footer::before {
 /* PC ve mobilde basili buton ikonlarinin gold kontrasti korunur. */
 button:active,
 [role="button"]:active,
+a:active,
 button:focus-visible,
-[role="button"]:focus-visible {
+[role="button"]:focus-visible,
+a:focus-visible {
   opacity: 1 !important;
 }
 
@@ -3549,6 +3551,10 @@ button:active span[style*="mask"],
 [role="button"]:active svg,
 [role="button"]:active [role="img"],
 [role="button"]:active span[style*="mask"],
+a:active img,
+a:active svg,
+a:active [role="img"],
+a:active span[style*="mask"],
 button:focus-visible img,
 button:focus-visible svg,
 button:focus-visible [role="img"],
@@ -3556,7 +3562,11 @@ button:focus-visible span[style*="mask"],
 [role="button"]:focus-visible img,
 [role="button"]:focus-visible svg,
 [role="button"]:focus-visible [role="img"],
-[role="button"]:focus-visible span[style*="mask"] {
+[role="button"]:focus-visible span[style*="mask"],
+a:focus-visible img,
+a:focus-visible svg,
+a:focus-visible [role="img"],
+a:focus-visible span[style*="mask"] {
   opacity: 1 !important;
   filter: none !important;
   visibility: visible !important;
