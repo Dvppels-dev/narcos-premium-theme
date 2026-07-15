@@ -1,0 +1,421 @@
+/* =========================================================
+   NarcosBahis — Premium Gold Glass Theme
+   Gercek ve kararlı data-mj secicileri hedeflenmistir.
+   Mevcut custom.css dosyasinin SONUNA ekleyin.
+   ========================================================= */
+
+:root {
+  --ng-gold-1: #8f6424;
+  --ng-gold-2: #c99843;
+  --ng-gold-3: #f2d58a;
+  --ng-gold-4: #fff2bd;
+  --ng-ink: #070708;
+  --ng-grey-1: #111114;
+  --ng-grey-2: #1b1b20;
+  --ng-grey-3: #29292f;
+  --ng-line: rgba(242, 213, 138, 0.22);
+  --ng-glass: rgba(24, 24, 28, 0.72);
+  --ng-text: #f7f3e8;
+  --ng-muted: rgba(247, 243, 232, 0.64);
+  --ng-shadow: 0 18px 50px rgba(0, 0, 0, 0.42);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  color: var(--ng-text) !important;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(201, 152, 67, 0.18), transparent 30rem),
+    radial-gradient(circle at 94% 20%, rgba(143, 100, 36, 0.13), transparent 34rem),
+    linear-gradient(145deg, #070708 0%, #111114 52%, #09090b 100%) !important;
+  background-attachment: fixed !important;
+}
+
+#root,
+main {
+  background-color: transparent !important;
+}
+
+/* Hafif premium doku */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+  background-size: 38px 38px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 88%);
+  mask-image: linear-gradient(to bottom, #000, transparent 88%);
+}
+
+/* ---------------- HEADER ---------------- */
+[aria-label="site-header"] {
+  isolation: isolate;
+  background: linear-gradient(110deg, rgba(20, 20, 24, .88), rgba(35, 32, 27, .72)) !important;
+  border-bottom: 1px solid var(--ng-line) !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, .38), inset 0 1px rgba(255, 255, 255, .06) !important;
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+
+[aria-label="site-header"]::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -1px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--ng-gold-3), transparent);
+  box-shadow: 0 0 18px rgba(242, 213, 138, .38);
+}
+
+[data-mj="logo"] img {
+  filter: drop-shadow(0 5px 14px rgba(201, 152, 67, .22));
+}
+
+[data-mj="login-button"],
+[data-mj="register-button"],
+[data-mj="header-special-button"] {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px !important;
+  transition: transform .22s ease, box-shadow .22s ease, filter .22s ease !important;
+}
+
+[data-mj="login-button"] {
+  color: var(--ng-gold-3) !important;
+  border: 1px solid rgba(242, 213, 138, .56) !important;
+  background: rgba(255, 255, 255, .035) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.08), 0 6px 18px rgba(0,0,0,.2);
+  backdrop-filter: blur(10px);
+}
+
+[data-mj="register-button"] {
+  color: #17130b !important;
+  border: 1px solid rgba(255, 242, 189, .72) !important;
+  background: linear-gradient(135deg, var(--ng-gold-1), var(--ng-gold-3) 48%, var(--ng-gold-4) 72%, var(--ng-gold-2)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.55), 0 8px 24px rgba(201, 152, 67, .25) !important;
+}
+
+[data-mj="login-button"]:hover,
+[data-mj="register-button"]:hover,
+[data-mj="header-special-button"]:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 10px 28px rgba(201, 152, 67, .30) !important;
+}
+
+/* ---------------- GLASS KARTLAR ---------------- */
+[data-mj="widget-pages-item"],
+[data-mj="widget-game-card"] {
+  border: 1px solid rgba(242, 213, 138, .13) !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.018)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.055), 0 14px 34px rgba(0,0,0,.25) !important;
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease !important;
+}
+
+[data-mj="widget-pages-item"]:hover,
+[data-mj="widget-game-card"]:hover {
+  z-index: 2;
+  position: relative;
+  transform: translateY(-4px) scale(1.025) !important;
+  border-color: rgba(242, 213, 138, .44) !important;
+  box-shadow: 0 18px 45px rgba(0,0,0,.38), 0 0 24px rgba(201,152,67,.10) !important;
+}
+
+[aria-label="arrow_left"],
+[aria-label="arrow_right"] {
+  color: var(--ng-gold-3) !important;
+  border: 1px solid rgba(242, 213, 138, .42) !important;
+  background: linear-gradient(145deg, rgba(42,42,48,.92), rgba(17,17,20,.94)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.08), 0 8px 22px rgba(0,0,0,.32) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* ---------------- FOOTER: GREY + GOLD ---------------- */
+footer {
+  position: relative;
+  overflow: hidden;
+  padding: 52px 20px 28px !important;
+  color: var(--ng-text) !important;
+  border-top: 1px solid rgba(242, 213, 138, .34) !important;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(201, 152, 67, .18), transparent 26rem),
+    radial-gradient(circle at 86% 115%, rgba(242, 213, 138, .08), transparent 28rem),
+    linear-gradient(135deg, #29292f 0%, #19191e 38%, #24231f 68%, #111114 100%) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.06), 0 -16px 46px rgba(0,0,0,.28) !important;
+}
+
+footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 16%, rgba(255,255,255,.025) 37%, transparent 55%),
+    linear-gradient(90deg, transparent, rgba(242,213,138,.10), transparent) top / 100% 1px no-repeat;
+}
+
+[data-mj="footer-content"] {
+  position: relative;
+  z-index: 1;
+  width: min(1220px, 100%) !important;
+  margin-inline: auto !important;
+}
+
+[data-mj="footer-top"] {
+  gap: 28px !important;
+  padding: 24px !important;
+  border: 1px solid rgba(242, 213, 138, .16);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.016));
+  box-shadow: inset 0 1px rgba(255,255,255,.06), var(--ng-shadow);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+}
+
+[data-mj="footer-logo"] img {
+  filter: drop-shadow(0 7px 20px rgba(201, 152, 67, .24));
+}
+
+[data-mj="footer-nav"] {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 12px 32px !important;
+  margin: 28px 0 !important;
+  padding: 28px !important;
+  border-block: 1px solid rgba(242,213,138,.12);
+}
+
+[data-mj="footer-nav-item"] a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(247, 243, 232, .72) !important;
+  text-decoration: none !important;
+  transition: color .2s ease, transform .2s ease !important;
+}
+
+[data-mj="footer-nav-item"] a::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
+  border-radius: 50%;
+  background: var(--ng-gold-2);
+  box-shadow: 0 0 10px rgba(242,213,138,.38);
+}
+
+[data-mj="footer-nav-item"] a:hover {
+  color: var(--ng-gold-3) !important;
+  transform: translateX(4px);
+}
+
+[data-mj="footer-bottom"] {
+  gap: 20px !important;
+  color: var(--ng-muted) !important;
+}
+
+[data-mj="social-links"] a {
+  border: 1px solid rgba(242,213,138,.16);
+  border-radius: 10px;
+  background: rgba(255,255,255,.035);
+  box-shadow: inset 0 1px rgba(255,255,255,.05);
+  transition: transform .2s ease, border-color .2s ease, background .2s ease !important;
+}
+
+[data-mj="social-links"] a:hover {
+  transform: translateY(-3px);
+  border-color: rgba(242,213,138,.5);
+  background: rgba(201,152,67,.10);
+}
+
+[data-mj="footer-copyright"] {
+  color: rgba(247,243,232,.52) !important;
+}
+
+/* ---------------- LISANS BANDI ---------------- */
+#narcos-license-banner {
+  width: 100%;
+  margin: 28px auto 4px;
+}
+
+#narcos-license-banner .ng-license-link {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 86px;
+  padding: 16px 22px;
+  overflow: hidden;
+  color: var(--ng-text);
+  text-decoration: none;
+  border: 1px solid rgba(242, 213, 138, .42);
+  border-radius: 16px;
+  background:
+    linear-gradient(105deg, rgba(65,65,72,.82), rgba(32,32,37,.88) 45%, rgba(82,67,39,.68));
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.10),
+    inset 0 -1px rgba(0,0,0,.35),
+    0 16px 38px rgba(0,0,0,.34),
+    0 0 28px rgba(201,152,67,.07);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+#narcos-license-banner .ng-license-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 15%, rgba(255,255,255,.09) 38%, transparent 55%);
+  transform: translateX(-115%);
+  transition: transform .65s ease;
+}
+
+#narcos-license-banner .ng-license-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,242,189,.72);
+  box-shadow: 0 20px 46px rgba(0,0,0,.42), 0 0 34px rgba(201,152,67,.13);
+}
+
+#narcos-license-banner .ng-license-link:hover::before {
+  transform: translateX(115%);
+}
+
+.ng-license-emblem {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  color: #19140b;
+  font-size: 24px;
+  font-weight: 900;
+  border: 1px solid rgba(255,255,255,.56);
+  border-radius: 15px;
+  background: linear-gradient(135deg, var(--ng-gold-1), var(--ng-gold-3) 54%, var(--ng-gold-4));
+  box-shadow: inset 0 1px rgba(255,255,255,.58), 0 8px 22px rgba(201,152,67,.25);
+}
+
+.ng-license-copy {
+  min-width: 0;
+}
+
+.ng-license-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ng-gold-3);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.ng-license-title {
+  display: block;
+  color: #fffaf0;
+  font-size: clamp(15px, 1.6vw, 19px);
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.ng-license-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  white-space: nowrap;
+  color: var(--ng-gold-3);
+  font-size: 12px;
+  font-weight: 750;
+  border: 1px solid rgba(242,213,138,.28);
+  border-radius: 10px;
+  background: rgba(0,0,0,.18);
+}
+
+.ng-license-action::after {
+  content: "→";
+  font-size: 16px;
+  transition: transform .2s ease;
+}
+
+.ng-license-link:hover .ng-license-action::after {
+  transform: translateX(3px);
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 900px) {
+  [data-mj="footer-nav"] {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  body {
+    background-attachment: scroll !important;
+  }
+
+  footer {
+    padding: 34px 14px 84px !important;
+  }
+
+  [data-mj="footer-top"] {
+    padding: 18px !important;
+    border-radius: 14px;
+  }
+
+  [data-mj="footer-nav"] {
+    grid-template-columns: 1fr;
+    gap: 9px !important;
+    padding: 22px 14px !important;
+    text-align: center;
+  }
+
+  [data-mj="footer-nav-item"] a {
+    justify-content: center;
+  }
+
+  #narcos-license-banner .ng-license-link {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 13px;
+    padding: 15px;
+  }
+
+  .ng-license-emblem {
+    width: 46px;
+    height: 46px;
+    font-size: 21px;
+  }
+
+  .ng-license-action {
+    grid-column: 1 / -1;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
