@@ -558,6 +558,63 @@ body::before {
   transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease !important;
 }
 
+@keyframes ng-game-card-neon-spin {
+  to { transform: rotate(360deg) scale(1.12); }
+}
+
+/* Masaüstünde her oyun kartının çevresinde dolaşan premium gold ışık. */
+@media (min-width: 621px) {
+  [data-mj="game-catalog-card"] {
+    isolation: isolate;
+    border-color: transparent !important;
+    background: transparent !important;
+  }
+
+  [data-mj="game-catalog-card"]::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: -7%;
+    pointer-events: none;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg 58deg,
+      rgba(183,123,30,.20) 76deg,
+      #ffe99d 92deg,
+      #b77b1e 106deg,
+      transparent 126deg 238deg,
+      rgba(242,213,138,.18) 258deg,
+      #fff4bd 274deg,
+      transparent 296deg 360deg
+    );
+    filter: drop-shadow(0 0 7px rgba(242,213,138,.55));
+    animation: ng-game-card-neon-spin 3.8s linear infinite;
+  }
+
+  [data-mj="game-catalog-card"]::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 2px;
+    pointer-events: none;
+    border-radius: 13px;
+    background: linear-gradient(145deg, rgba(31,29,27,.98), rgba(12,12,14,.98));
+  }
+
+  [data-mj="game-catalog-card"] > img,
+  [data-mj="game-catalog-card"] > span[data-site-badge="true"] {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-mj="game-catalog-card"]::before {
+    animation: none !important;
+  }
+}
+
 [data-mj="game-catalog-card"]:hover,
 [data-mj="game-catalog-card"]:focus-visible {
   border-color: rgba(242,213,138,.72) !important;
@@ -683,6 +740,11 @@ body::before {
   }
 
   [data-mj="game-catalog-provider-bottom-sheet-body"] > div:first-child > div {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 0 12px !important;
+    position: relative !important;
     min-height: 44px !important;
     border: 1px solid rgba(242,213,138,.22) !important;
     border-radius: 13px !important;
@@ -690,13 +752,33 @@ body::before {
     box-shadow: inset 0 1px rgba(255,255,255,.06) !important;
   }
 
+  [data-mj="game-catalog-provider-bottom-sheet-body"] > div:first-child > div > div:first-child {
+    display: grid !important;
+    place-items: center !important;
+    flex: 0 0 28px !important;
+    width: 28px !important;
+    height: 28px !important;
+    position: static !important;
+  }
+
   [data-mj="game-catalog-provider-bottom-sheet-search"] {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
     min-height: 42px !important;
-    padding: 0 12px !important;
+    margin: 0 !important;
+    padding: 0 4px !important;
     color: #fff !important;
     background: transparent !important;
     font-size: 13px !important;
     font-weight: 700 !important;
+    line-height: 42px !important;
+    text-align: left !important;
+  }
+
+  [data-mj="game-catalog-provider-bottom-sheet-search"]::placeholder {
+    color: rgba(255,255,255,.72) !important;
+    opacity: 1 !important;
   }
 
   [data-mj="game-catalog-provider-bottom-sheet-body"] [role="img"] {
@@ -763,11 +845,12 @@ body::before {
   }
 
   [data-mj="game-catalog-provider-item"] {
-    display: flex !important;
-    align-items: center !important;
+    display: grid !important;
+    grid-template-rows: minmax(76px, 1fr) auto !important;
+    align-items: stretch !important;
     gap: 8px !important;
-    min-height: 58px !important;
-    padding: 8px !important;
+    min-height: 132px !important;
+    padding: 9px !important;
     box-sizing: border-box !important;
     border: 1px solid rgba(242,213,138,.14) !important;
     border-radius: 12px !important;
@@ -786,22 +869,27 @@ body::before {
   [data-mj="game-catalog-provider-item"] > div:first-child {
     display: grid !important;
     place-items: center !important;
-    flex: 0 0 36px !important;
-    width: 36px !important;
-    height: 36px !important;
+    width: 100% !important;
+    height: 76px !important;
+    min-height: 76px !important;
     border: 1px solid rgba(242,213,138,.18) !important;
     border-radius: 9px !important;
     background: rgba(7,7,9,.70) !important;
   }
 
   [data-mj="game-catalog-provider-item"] > div:first-child img {
-    width: 30px !important;
-    height: 24px !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
     object-fit: contain !important;
   }
 
   [data-mj="game-catalog-provider-item"] > div:last-child {
     min-width: 0 !important;
+    padding: 0 2px 2px !important;
+    text-align: center !important;
   }
 
   [data-mj="game-catalog-provider-item"] p {

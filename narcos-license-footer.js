@@ -255,6 +255,15 @@
     return true;
   }
 
+  function localizeProviderSheet() {
+    var search = document.querySelector('[data-mj="game-catalog-provider-bottom-sheet-search"]');
+    if (!search) return false;
+
+    search.placeholder = "Sağlayıcı ara";
+    search.setAttribute("aria-label", "Sağlayıcı ara");
+    return true;
+  }
+
   function installContactButton(target) {
     var button = document.getElementById("narcos-contact-button");
     if (!button) {
@@ -360,6 +369,7 @@
     installHeaderLicenseBadge();
     installMobileCallButton();
     markMobileSidebar();
+    localizeProviderSheet();
     installFooterEnhancements();
   }
 
