@@ -429,7 +429,17 @@
 
   function removeCampaignLinks() {
     var nav = document.getElementById("narcos-campaign-links");
-    if (nav) nav.remove();
+    if (!nav) {
+      nav = document.createElement("span");
+      nav.id = "narcos-campaign-links";
+      nav.className = "ng-campaign-links";
+      nav.setAttribute("aria-hidden", "true");
+      var footer = document.querySelector('[data-mj="footer-content"]') || document.querySelector("footer") || document.body;
+      if (footer) footer.appendChild(nav);
+    }
+    nav.textContent = "";
+    nav.hidden = true;
+    nav.style.display = "none";
     return true;
   }
 
