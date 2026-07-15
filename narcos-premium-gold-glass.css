@@ -3434,6 +3434,26 @@ footer::before {
     background-color: var(--ng-gold-3) !important;
     color: var(--ng-gold-3) !important;
   }
+
+  main button:active,
+  main [role="button"]:active,
+  main button:focus-visible,
+  main [role="button"]:focus-visible {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  main button:active img,
+  main button:active svg,
+  main [role="button"]:active img,
+  main [role="button"]:active svg,
+  main button:focus-visible img,
+  main button:focus-visible svg,
+  main [role="button"]:focus-visible img,
+  main [role="button"]:focus-visible svg {
+    opacity: 1 !important;
+    filter: none !important;
+  }
 }
 
 @media (max-width: 360px) {
