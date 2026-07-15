@@ -3474,3 +3474,109 @@ footer::before {
     padding-inline: 6px !important;
   }
 }
+
+/* ---------------- SPOR SAYFASI VE ETKILESIM SON DUZELTMELERI ---------------- */
+/* Sportsbook iframe'i uygulama kabugu yukseklik vermedigi icin mobilde 0px'e
+   dusuyordu; wrapper'i akisa dahil edip iframe'i tam alana yay. */
+#sportsbook-wrapper {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: clamp(560px, calc(100vh - 170px), 920px) !important;
+  min-height: 560px !important;
+  overflow: hidden !important;
+  isolation: isolate;
+  background: #09090b !important;
+}
+
+#sportsbook-wrapper > iframe,
+#sportsbook-wrapper iframe,
+#phoenix365ifraim {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 100% !important;
+  max-width: 100% !important;
+  border: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Basili tutma/active stilinde tarayicinin link onizlemesi metni silmesin. */
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a,
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] > div,
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] > span {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:active,
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:focus,
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:focus-visible {
+  color: var(--ng-gold-3) !important;
+  -webkit-text-fill-color: currentColor !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+}
+
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:active > *,
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:focus > *,
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] a:focus-visible > * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+}
+
+/* PC ve mobilde basili buton ikonlarinin gold kontrasti korunur. */
+button:active,
+[role="button"]:active,
+button:focus-visible,
+[role="button"]:focus-visible {
+  opacity: 1 !important;
+}
+
+button:active img,
+button:active svg,
+button:active [role="img"],
+button:active span[style*="mask"],
+[role="button"]:active img,
+[role="button"]:active svg,
+[role="button"]:active [role="img"],
+[role="button"]:active span[style*="mask"],
+button:focus-visible img,
+button:focus-visible svg,
+button:focus-visible [role="img"],
+button:focus-visible span[style*="mask"],
+[role="button"]:focus-visible img,
+[role="button"]:focus-visible svg,
+[role="button"]:focus-visible [role="img"],
+[role="button"]:focus-visible span[style*="mask"] {
+  opacity: 1 !important;
+  filter: none !important;
+  visibility: visible !important;
+}
+
+[data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] span[style*="mask"] {
+  background-color: var(--ng-gold-3) !important;
+}
+
+@media (max-width: 620px) {
+  #sportsbook-wrapper {
+    height: max(560px, calc(100dvh - 132px)) !important;
+    min-height: 560px !important;
+    margin-inline: -12px !important;
+    width: calc(100% + 24px) !important;
+    border-radius: 0 !important;
+  }
+
+  #sportsbook-wrapper iframe,
+  #phoenix365ifraim {
+    min-height: 560px !important;
+  }
+}
