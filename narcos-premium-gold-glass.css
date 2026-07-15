@@ -2030,6 +2030,79 @@ footer::before {
   }
 }
 
+/* ---------------- LIGLER WIDGET KARTLARI ---------------- */
+.ng-leagues-widget {
+  --ng-league-card-width: clamp(240px, 26vw, 360px);
+}
+
+.ng-leagues-widget [data-mj="widget-collection-slider-list"] {
+  gap: 16px !important;
+  overflow: hidden !important;
+}
+
+.ng-leagues-widget [data-mj="widget-collection-slider-item"] {
+  flex: 0 0 var(--ng-league-card-width) !important;
+  width: var(--ng-league-card-width) !important;
+  min-width: var(--ng-league-card-width) !important;
+  max-width: var(--ng-league-card-width) !important;
+}
+
+.ng-leagues-widget [data-mj="widget-collection-slider-item"] > a {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(242,213,138,.26) !important;
+  border-radius: 18px !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.018)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.10), 0 12px 30px rgba(0,0,0,.28) !important;
+  transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease !important;
+}
+
+.ng-leagues-widget [data-mj="widget-collection-slider-item"] > a:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(242,213,138,.68) !important;
+  box-shadow: 0 16px 34px rgba(201,152,67,.25), inset 0 1px rgba(255,255,255,.14) !important;
+}
+
+.ng-leagues-widget [data-mj="widget-collection-slider-item"] img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 592 / 288 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+.ng-leagues-widget [data-mj="widget-collection-slider-item"] strong {
+  display: block !important;
+  min-height: 0 !important;
+  padding: 7px 10px 9px !important;
+  color: var(--ng-gold-3) !important;
+  text-align: center !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+}
+
+@media (max-width: 620px) {
+  .ng-leagues-widget {
+    --ng-league-card-width: 220px;
+  }
+
+  .ng-leagues-widget [data-mj="widget-collection-slider-list"] {
+    gap: 10px !important;
+  }
+
+  .ng-leagues-widget [data-mj="widget-collection-slider-item"] > a {
+    border-radius: 14px !important;
+  }
+
+  .ng-leagues-widget [data-mj="widget-collection-slider-item"] strong {
+    padding: 6px 8px 8px !important;
+    font-size: 12px !important;
+  }
+}
+
 /* ---------------- PROMOSYON DETAY SAYFASI ---------------- */
 [data-mj="promotion-details"] {
   width: min(1240px, calc(100% - 28px)) !important;

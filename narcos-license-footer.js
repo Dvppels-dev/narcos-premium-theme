@@ -475,6 +475,20 @@
     return true;
   }
 
+  function markLeagueWidget() {
+    var widgets = document.querySelectorAll('[data-mj="widget-collection-slider"]');
+    for (var i = 0; i < widgets.length; i++) {
+      var headings = widgets[i].querySelectorAll("p");
+      for (var j = 0; j < headings.length; j++) {
+        if ((headings[j].textContent || "").trim().toLowerCase() === "ligler") {
+          widgets[i].classList.add("ng-leagues-widget");
+          break;
+        }
+      }
+    }
+    return true;
+  }
+
   function installFooterEnhancements() {
     var footerContent = document.querySelector('[data-mj="footer-content"]');
     var footer = document.querySelector("footer");
@@ -494,6 +508,7 @@
     installHeaderLicenseBadge();
     installMobileCallButton();
     markMobileSidebar();
+    markLeagueWidget();
     localizeProviderSheet();
     installCampaignPage();
     removeCampaignLinks();
