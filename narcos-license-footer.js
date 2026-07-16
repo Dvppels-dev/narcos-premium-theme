@@ -409,6 +409,94 @@
     document.documentElement.classList.toggle("ng-info-safe-route", needsSafeInfoHeader);
   }
 
+  function installGameHubWidget() {
+    var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
+    var isHome = path === "" || path === "/" || path === "/tr";
+    var widget = document.getElementById("narcos-game-hub");
+
+    if (!isHome) {
+      if (widget) widget.remove();
+      return false;
+    }
+
+    var main = document.querySelector('main[data-mj="page-content"]');
+    if (!main) return false;
+
+    var providers = main.querySelector('[data-mj="widget-top-providers"]');
+    var pages = main.querySelector('[data-mj="widget-pages"]');
+    if (providers && providers.parentElement !== main) providers = null;
+    if (pages && pages.parentElement !== main) pages = null;
+
+    if (!widget) {
+      widget = document.createElement("section");
+      widget.id = "narcos-game-hub";
+      widget.className = "ng-game-hub";
+      widget.setAttribute("aria-labelledby", "narcos-game-hub-title");
+
+      var head = document.createElement("div");
+      head.className = "ng-hub-head";
+      head.appendChild(makeText("span", "ng-hub-eyebrow", "NARCOS SELECT"));
+
+      var title = makeText("h2", "ng-hub-title", "NARCOS OYUN MERKEZİ");
+      title.id = "narcos-game-hub-title";
+      head.appendChild(title);
+      head.appendChild(makeText("p", "ng-hub-lead", "Oyununu seç, premium deneyime tek dokunuşla geç."));
+      widget.appendChild(head);
+
+      var links = [
+        { icon: "♠", title: "CASINO", text: "Slot ve masa oyunlarını keşfet", href: "/tr/casino/all" },
+        { icon: "◉", title: "CANLI CASINO", text: "Canlı yayınlı masalara geç", href: "/tr/livecasino" },
+        { icon: "✦", title: "PROMOSYONLAR", text: "Güncel fırsatları incele", href: "/tr/promotions" }
+      ];
+
+      var nav = document.createElement("nav");
+      nav.className = "ng-hub-grid";
+      nav.setAttribute("aria-label", "Oyun merkezi bağlantıları");
+
+      for (var i = 0; i < links.length; i++) {
+        var item = links[i];
+        var link = document.createElement("a");
+        link.className = "ng-hub-card";
+        link.href = item.href;
+        link.setAttribute("aria-label", item.title + ": " + item.text);
+
+        var icon = makeText("span", "ng-hub-icon", item.icon);
+        icon.setAttribute("aria-hidden", "true");
+        link.appendChild(icon);
+
+        var copy = document.createElement("span");
+        copy.className = "ng-hub-copy";
+        copy.appendChild(makeText("strong", "ng-hub-card-title", item.title));
+        copy.appendChild(makeText("small", "ng-hub-card-text", item.text));
+        link.appendChild(copy);
+
+        var arrow = makeText("span", "ng-hub-arrow", "→");
+        arrow.setAttribute("aria-hidden", "true");
+        link.appendChild(arrow);
+        nav.appendChild(link);
+      }
+
+      widget.appendChild(nav);
+      widget.appendChild(makeText(
+        "p",
+        "ng-hub-note",
+        "18+ • Eğlence için oynayın • Bütçe ve zaman limitlerinizi belirleyin."
+      ));
+    }
+
+    if (providers) {
+      if (widget.parentElement !== main || widget.nextElementSibling !== providers) {
+        main.insertBefore(widget, providers);
+      }
+    } else if (pages) {
+      if (widget.previousElementSibling !== pages) pages.insertAdjacentElement("afterend", widget);
+    } else if (widget.parentElement !== main) {
+      main.appendChild(widget);
+    }
+
+    return true;
+  }
+
   function shouldShowJackpotWidget() {
     var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
     return /^\/tr\/casino(?:\/|$)/.test(path);
@@ -681,6 +769,7 @@
 
   function installInterfaceEnhancements() {
     markCurrentRoute();
+    installGameHubWidget();
     installHeaderLicenseBadge();
     installMobileCallButton();
     installHeaderTelegramButton();

@@ -2346,6 +2346,313 @@ footer::before {
   }
 }
 
+/* =========================================================
+   2026-07-17: isolated header, page background and game hub fixes
+   ========================================================= */
+
+/* The artwork stays behind the viewport at every scroll position without
+   changing #root/main dimensions or the platform's document flow. */
+body {
+  isolation: isolate;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-color: #070708;
+  background-image:
+    linear-gradient(180deg, rgba(5,5,7,.18) 0%, rgba(7,7,9,.46) 56%, rgba(7,7,8,.78) 100%),
+    url("./narcos-premium-background-v2.webp");
+  background-position: center top, center top;
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+}
+
+/* Desktop: remove only the anonymous max-width wrapper around the top row. */
+@media (min-width: 621px) {
+  [data-mj="header"] > div:has(> [data-mj="custom-header"]) {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-mj="custom-header"] {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+}
+
+/* Mobile homepage: the platform wrapper reserved 56px above a 60px row,
+   leaving a visible 24px gap after the 32px announcement. */
+@media (max-width: 620px) {
+  body::after {
+    background-image:
+      linear-gradient(180deg, rgba(5,5,7,.22) 0%, rgba(7,7,9,.50) 56%, rgba(7,7,8,.82) 100%),
+      url("./narcos-premium-background-v2-mobile.webp");
+  }
+
+  html.ng-home-route [data-mj="header"] {
+    gap: 0 !important;
+    row-gap: 0 !important;
+    min-height: 92px !important;
+  }
+
+  html.ng-home-route [data-mj="header"] > div:has(> [data-mj="custom-header"]) {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    order: 0 !important;
+    flex: 0 0 60px !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+  }
+
+  html.ng-home-route [data-mj="custom-header"] {
+    margin: 0 !important;
+  }
+}
+
+/* Homepage-only premium quick-access widget. */
+#narcos-game-hub {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: min(calc(100% - 32px), 1760px);
+  margin: 18px auto 24px;
+  padding: clamp(16px, 2vw, 26px);
+  border: 1px solid transparent;
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(14,14,17,.94), rgba(32,27,20,.84)) padding-box,
+    linear-gradient(110deg, #8f6424, #fff2bd, #c99843, #8f6424) border-box;
+  background-size: 100% 100%, 300% 100%;
+  box-shadow: 0 18px 48px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,242,189,.08);
+  animation: ng-hub-border 7s linear infinite;
+}
+
+#narcos-game-hub::before {
+  content: "";
+  position: absolute;
+  inset: -45% 12% auto;
+  height: 145px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse, rgba(242,213,138,.16), transparent 70%);
+  filter: blur(18px);
+}
+
+.ng-hub-head {
+  margin: 0 auto 16px;
+  text-align: center;
+}
+
+.ng-hub-eyebrow {
+  color: var(--ng-gold-3);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .2em;
+}
+
+.ng-hub-title {
+  margin: 5px 0 3px !important;
+  color: transparent !important;
+  font-size: clamp(20px, 2vw, 32px) !important;
+  background: linear-gradient(90deg, #c99843, #fff2bd, #c99843);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.ng-hub-lead {
+  margin: 0;
+  color: var(--ng-muted);
+  font-size: 14px;
+}
+
+.ng-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ng-hub-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 82px;
+  padding: 14px 16px;
+  overflow: hidden;
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(242,213,138,.22);
+  border-radius: 17px;
+  background: linear-gradient(135deg, rgba(255,255,255,.055), rgba(201,152,67,.07));
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+.ng-hub-card::after {
+  content: "";
+  position: absolute;
+  inset: -80% -40%;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 42%, rgba(255,242,189,.22) 50%, transparent 58%);
+  transform: translateX(-55%);
+  animation: ng-hub-shine 5.8s ease-in-out infinite;
+}
+
+.ng-hub-card:hover,
+.ng-hub-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(255,242,189,.64);
+  box-shadow: 0 12px 28px rgba(201,152,67,.16);
+  outline: none;
+}
+
+.ng-hub-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: #16100a;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #c99843, #fff2bd, #b67b20);
+  box-shadow: 0 8px 20px rgba(201,152,67,.24);
+  font-size: 22px;
+}
+
+.ng-hub-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ng-hub-copy strong {
+  font-size: 15px;
+  letter-spacing: .04em;
+}
+
+.ng-hub-copy small {
+  color: var(--ng-muted);
+  font-size: 12px;
+}
+
+.ng-hub-arrow {
+  color: var(--ng-gold-3);
+  font-size: 20px;
+}
+
+.ng-hub-note {
+  margin: 13px 0 0;
+  color: rgba(247,243,232,.54);
+  font-size: 11px;
+  text-align: center;
+}
+
+@keyframes ng-hub-border {
+  to { background-position: 0 0, 300% 0; }
+}
+
+@keyframes ng-hub-shine {
+  0%, 68%, 100% { transform: translateX(-55%); }
+  82% { transform: translateX(55%); }
+}
+
+@media (max-width: 620px) {
+  #narcos-game-hub {
+    width: calc(100% - 24px);
+    margin: 12px auto 18px;
+    padding: 13px 10px;
+    border-radius: 18px;
+    animation: none;
+  }
+
+  #narcos-game-hub::before {
+    filter: none;
+  }
+
+  .ng-hub-head {
+    margin-bottom: 10px;
+  }
+
+  .ng-hub-eyebrow {
+    font-size: 9px;
+  }
+
+  .ng-hub-title {
+    font-size: 18px !important;
+  }
+
+  .ng-hub-lead {
+    font-size: 11px;
+  }
+
+  .ng-hub-grid {
+    gap: 7px;
+  }
+
+  .ng-hub-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-height: 94px;
+    padding: 9px 5px;
+    text-align: center;
+    border-radius: 13px;
+  }
+
+  .ng-hub-card::after {
+    display: none;
+  }
+
+  .ng-hub-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 18px;
+  }
+
+  .ng-hub-copy strong {
+    font-size: 11px;
+  }
+
+  .ng-hub-copy small,
+  .ng-hub-arrow {
+    display: none;
+  }
+
+  .ng-hub-note {
+    font-size: 9px;
+    line-height: 1.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #narcos-game-hub,
+  .ng-hub-card::after {
+    animation: none !important;
+  }
+
+  .ng-hub-card {
+    transition: none;
+  }
+}
+
 /* ---------------- LIGLER WIDGET KARTLARI ---------------- */
 .ng-leagues-widget {
   --ng-league-card-width: clamp(240px, 26vw, 360px);
