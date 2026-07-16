@@ -31,7 +31,7 @@ body {
   background-color: #070708 !important;
   background-image:
     linear-gradient(180deg, rgba(5,5,7,.18) 0%, rgba(7,7,9,.46) 56%, rgba(7,7,8,.78) 100%),
-    url("./narcos-premium-background.png") !important;
+    url("./narcos-premium-background-v2.webp") !important;
   background-position: center top, center top !important;
   background-repeat: no-repeat, no-repeat !important;
   background-size: cover, cover !important;
@@ -4143,6 +4143,286 @@ a:focus-visible span[style*="mask"] {
     object-fit: cover !important;
     object-position: center !important;
     border-radius: inherit !important;
+  }
+}
+
+/* =========================================================
+   2026-07-16 — FAST MOBILE / TELEGRAM / EGT JACKPOT
+   ========================================================= */
+
+/* Header Telegram: supplied icon is used as a mask so it is always premium gold. */
+.ng-telegram-button {
+  position: relative;
+  display: inline-grid !important;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 40px;
+  padding: 0 !important;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid rgba(242,213,138,.46) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, rgba(201,152,67,.16), rgba(10,10,13,.84)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 7px 20px rgba(0,0,0,.28), 0 0 18px rgba(201,152,67,.10) !important;
+  transition: transform .16s ease, border-color .16s ease, filter .16s ease !important;
+}
+
+.ng-telegram-button:hover,
+.ng-telegram-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255,242,189,.82) !important;
+  filter: brightness(1.12);
+}
+
+.ng-telegram-button:active {
+  transform: translateY(0) scale(.96);
+}
+
+.ng-telegram-icon {
+  display: block;
+  width: 23px;
+  height: 23px;
+  background: linear-gradient(135deg, #b77b1e, #ffe99d 56%, #d49a2c);
+  -webkit-mask: url("./narcos-telegram-icon.png") center / contain no-repeat;
+  mask: url("./narcos-telegram-icon.png") center / contain no-repeat;
+  filter: drop-shadow(0 0 7px rgba(242,213,138,.42));
+}
+
+/* EGT jackpot: display values are intentionally static until a licensed feed is connected. */
+#narcos-egt-jackpot {
+  position: relative;
+  isolation: isolate;
+  width: min(1040px, calc(100% - 32px));
+  margin: 18px auto 24px;
+  padding: 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(242,213,138,.30);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(9,13,20,.94), rgba(18,24,35,.90) 48%, rgba(12,14,20,.96));
+  box-shadow: inset 0 1px rgba(255,255,255,.08), 0 18px 46px rgba(0,0,0,.34), 0 0 30px rgba(201,152,67,.08);
+  contain: layout paint style;
+}
+
+#narcos-egt-jackpot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(201,152,67,.14), transparent 35%),
+    linear-gradient(110deg, transparent 15%, rgba(255,255,255,.04) 46%, transparent 70%);
+}
+
+.ng-jackpot-heading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  min-width: 178px;
+  padding: 10px 18px;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  border: 1px solid rgba(255,242,189,.44);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(5,6,9,.98), rgba(38,27,15,.96));
+  box-shadow: 0 10px 28px rgba(0,0,0,.48), 0 0 22px rgba(201,152,67,.18);
+}
+
+.ng-jackpot-kicker,
+.ng-jackpot-title,
+.ng-jackpot-label,
+.ng-jackpot-value {
+  display: block;
+}
+
+.ng-jackpot-kicker {
+  color: var(--ng-gold-2);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 1.7px;
+}
+
+.ng-jackpot-title {
+  margin-top: 2px;
+  color: var(--ng-gold-3);
+  font-size: 17px;
+  font-weight: 950;
+  letter-spacing: .6px;
+  text-shadow: 0 0 14px rgba(242,213,138,.28);
+}
+
+.ng-jackpot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 28px;
+}
+
+.ng-jackpot-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 112px;
+  padding: 17px 16px 15px;
+  box-sizing: border-box;
+  border: 1px solid rgba(242,213,138,.28);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(27,39,56,.92), rgba(13,18,27,.98));
+  box-shadow: inset 0 1px rgba(255,255,255,.065), 0 11px 26px rgba(0,0,0,.28);
+}
+
+.ng-jackpot-suit {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #111217;
+  font-size: 47px;
+  line-height: 1;
+  -webkit-text-stroke: 1px var(--ng-gold-2);
+  text-shadow: 0 3px 10px rgba(0,0,0,.55);
+}
+
+.ng-jackpot-card-red .ng-jackpot-suit {
+  color: #e1242f;
+  -webkit-text-stroke-color: #f1b94a;
+}
+
+.ng-jackpot-label {
+  margin-top: 8px;
+  color: rgba(247,243,232,.52);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.ng-jackpot-value {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(25px, 3.3vw, 45px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: .01em;
+  text-shadow: 0 4px 16px rgba(0,0,0,.40);
+}
+
+@media (max-width: 620px) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  body {
+    background-image:
+      linear-gradient(180deg, rgba(5,5,7,.22) 0%, rgba(7,7,9,.50) 56%, rgba(7,7,8,.82) 100%),
+      url("./narcos-premium-background-v2-mobile.webp") !important;
+    background-position: center top, center top !important;
+    background-size: cover, 100% auto !important;
+    background-attachment: scroll, scroll !important;
+  }
+
+  body::before {
+    display: none !important;
+  }
+
+  /* GPU-heavy glass effects are removed on small screens; visual hierarchy remains. */
+  [aria-label="site-header"],
+  [data-mj="header-nav"],
+  [data-mj="widget-game-card"],
+  [data-mj="widget-pages-item"],
+  [data-mj="game-catalog-card"],
+  [data-mj="footer-top"],
+  #narcos-social-panel,
+  #narcos-license-banner .ng-license-panel {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  [data-mj="widget-game-card"],
+  [data-mj="widget-pages-item"],
+  [data-mj="game-catalog-card"] {
+    contain: layout paint style;
+    box-shadow: 0 5px 13px rgba(0,0,0,.24) !important;
+    transition-duration: .12s !important;
+  }
+
+  .ng-telegram-button {
+    flex-basis: 35px;
+    width: 35px;
+    height: 34px;
+    border-radius: 10px !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.10), 0 4px 12px rgba(0,0,0,.24) !important;
+  }
+
+  .ng-telegram-icon {
+    width: 20px;
+    height: 20px;
+    filter: none;
+  }
+
+  #narcos-egt-jackpot {
+    width: calc(100% - 20px);
+    margin: 10px auto 17px;
+    padding: 12px;
+    border-radius: 16px;
+    box-shadow: 0 9px 22px rgba(0,0,0,.27);
+  }
+
+  .ng-jackpot-grid {
+    gap: 10px 12px;
+  }
+
+  .ng-jackpot-card {
+    min-height: 78px;
+    padding: 13px 8px 10px;
+    border-radius: 13px;
+    box-shadow: inset 0 1px rgba(255,255,255,.055), 0 5px 13px rgba(0,0,0,.22);
+  }
+
+  .ng-jackpot-heading {
+    min-width: 116px;
+    padding: 6px 10px;
+  }
+
+  .ng-jackpot-kicker {
+    font-size: 6px;
+    letter-spacing: 1px;
+  }
+
+  .ng-jackpot-title {
+    font-size: 12px;
+  }
+
+  .ng-jackpot-suit {
+    top: -11px;
+    font-size: 31px;
+  }
+
+  .ng-jackpot-label {
+    margin-top: 5px;
+    font-size: 6px;
+    letter-spacing: 1px;
+  }
+
+  .ng-jackpot-value {
+    font-size: clamp(19px, 6vw, 27px);
+  }
+
+  /* Four games per row on Casino and Live Casino catalogues. */
+  [data-mj="game-catalog-module"] {
+    padding-inline: 7px !important;
+  }
+
+  [data-mj="game-catalog-list"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 7px 5px !important;
+  }
+
+  [data-mj="game-catalog-list"] [data-mj="game-catalog-card"] {
+    border-radius: 8px !important;
   }
 }
 

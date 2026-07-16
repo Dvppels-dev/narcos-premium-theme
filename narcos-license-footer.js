@@ -275,19 +275,22 @@
       button.setAttribute("aria-label", "NarcosBahis destek e-posta adresine ulaşın");
     }
 
-    button.textContent = "";
-    var icon = document.createElement("span");
-    icon.className = "ng-contact-icon";
-    var image = document.createElement("img");
-    image.className = "ng-contact-image";
-    image.src = CHAT_ICON_URL;
-    image.alt = "";
-    image.width = 22;
-    image.height = 22;
-    image.setAttribute("aria-hidden", "true");
-    icon.appendChild(image);
-    button.appendChild(icon);
-    button.appendChild(makeText("span", "ng-contact-copy", "BİZE ULAŞIN: destek@narcosbahis.com"));
+    if (button.getAttribute("data-ng-version") !== "1") {
+      button.textContent = "";
+      var icon = document.createElement("span");
+      icon.className = "ng-contact-icon";
+      var image = document.createElement("img");
+      image.className = "ng-contact-image";
+      image.src = CHAT_ICON_URL;
+      image.alt = "";
+      image.width = 22;
+      image.height = 22;
+      image.setAttribute("aria-hidden", "true");
+      icon.appendChild(image);
+      button.appendChild(icon);
+      button.appendChild(makeText("span", "ng-contact-copy", "BİZE ULAŞIN: destek@narcosbahis.com"));
+      button.setAttribute("data-ng-version", "1");
+    }
 
     if (button.parentElement !== target) target.appendChild(button);
     return button;
@@ -336,6 +339,97 @@
       }
     } else if (button.parentElement !== target) {
       target.appendChild(button);
+    }
+    return true;
+  }
+
+  function installHeaderTelegramButton() {
+    var header = document.querySelector('[aria-label="site-header"]');
+    if (!header) return false;
+    var target = header.querySelector('[data-mj="header-right"]') || header;
+
+    var button = document.getElementById("narcos-telegram-button");
+    if (!button) {
+      button = makeExternalLink(
+        TELEGRAM_URL,
+        "ng-telegram-button",
+        "",
+        "NarcosBahis resmi Telegram kanalını aç"
+      );
+      button.id = "narcos-telegram-button";
+
+      var icon = document.createElement("span");
+      icon.className = "ng-telegram-icon";
+      icon.setAttribute("aria-hidden", "true");
+      button.appendChild(icon);
+    }
+
+    var callButton = document.getElementById("narcos-call-button");
+    var loginButton = target.querySelector('[data-mj="login-button"]');
+    var loginWrap = loginButton && loginButton.parentElement;
+
+    if (callButton && callButton.parentElement === target) {
+      if (button.parentElement !== target || button.nextElementSibling !== callButton) {
+        target.insertBefore(button, callButton);
+      }
+    } else if (loginWrap && loginWrap.parentElement === target) {
+      target.insertBefore(button, loginWrap);
+    } else if (button.parentElement !== target) {
+      target.appendChild(button);
+    }
+    return true;
+  }
+
+  function shouldShowJackpotWidget() {
+    var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
+    return path === "" || path === "/tr" || path.indexOf("/tr/casino") === 0 || path.indexOf("/tr/livecasino") === 0;
+  }
+
+  function makeJackpotCard(symbol, label, value, tone) {
+    var card = document.createElement("article");
+    card.className = "ng-jackpot-card ng-jackpot-card-" + tone;
+
+    var icon = makeText("span", "ng-jackpot-suit", symbol);
+    icon.setAttribute("aria-hidden", "true");
+    card.appendChild(icon);
+    card.appendChild(makeText("span", "ng-jackpot-label", label));
+    card.appendChild(makeText("strong", "ng-jackpot-value", value));
+    return card;
+  }
+
+  function installJackpotWidget() {
+    var widget = document.getElementById("narcos-egt-jackpot");
+    if (!shouldShowJackpotWidget()) {
+      if (widget) widget.remove();
+      return false;
+    }
+
+    var main = document.querySelector("main");
+    if (!main) return false;
+
+    if (!widget) {
+      widget = document.createElement("section");
+      widget.id = "narcos-egt-jackpot";
+      widget.setAttribute("aria-label", "EGT jackpot değerleri");
+
+      var heading = document.createElement("div");
+      heading.className = "ng-jackpot-heading";
+      heading.appendChild(makeText("span", "ng-jackpot-kicker", "PREMIUM JACKPOT"));
+      heading.appendChild(makeText("strong", "ng-jackpot-title", "EGT JACKPOT"));
+
+      var grid = document.createElement("div");
+      grid.className = "ng-jackpot-grid";
+      grid.appendChild(makeJackpotCard("♠", "SPADE", "118,868", "dark"));
+      grid.appendChild(makeJackpotCard("♥", "HEART", "53,868", "red"));
+      grid.appendChild(makeJackpotCard("♦", "DIAMOND", "1,597.72", "red"));
+      grid.appendChild(makeJackpotCard("♣", "CLUB", "314.69", "dark"));
+
+      widget.appendChild(heading);
+      widget.appendChild(grid);
+    }
+
+    if (widget.parentElement !== main || main.firstElementChild !== widget) {
+      main.insertBefore(widget, main.firstChild);
     }
     return true;
   }
@@ -559,6 +653,8 @@
   function installInterfaceEnhancements() {
     installHeaderLicenseBadge();
     installMobileCallButton();
+    installHeaderTelegramButton();
+    installJackpotWidget();
     markMobileSidebar();
     markLeagueWidget();
     installFooterNavigationColumns();
@@ -571,13 +667,22 @@
   installInterfaceEnhancements();
 
   var scheduled = false;
+  var idleHandle = 0;
   var observer = new MutationObserver(function () {
     if (scheduled) return;
     scheduled = true;
-    window.requestAnimationFrame(function () {
+
+    var runEnhancements = function () {
       scheduled = false;
+      idleHandle = 0;
       installInterfaceEnhancements();
-    });
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleHandle = window.requestIdleCallback(runEnhancements, { timeout: 240 });
+    } else {
+      idleHandle = window.setTimeout(runEnhancements, 72);
+    }
   });
 
   observer.observe(document.documentElement, {
