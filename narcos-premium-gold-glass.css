@@ -4426,6 +4426,69 @@ a:focus-visible span[style*="mask"] {
   }
 }
 
+/* Header gift: match the Telegram and call controls on desktop and mobile. */
+[data-mj="header-special-button"].ng-gift-button {
+  position: relative;
+  display: inline-grid !important;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  min-width: 42px !important;
+  height: 40px;
+  min-height: 40px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid rgba(242,213,138,.46) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, rgba(201,152,67,.16), rgba(10,10,13,.84)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 7px 20px rgba(0,0,0,.28), 0 0 18px rgba(201,152,67,.10) !important;
+  transition: transform .16s ease, border-color .16s ease, filter .16s ease !important;
+}
+
+[data-mj="header-special-button"].ng-gift-button > :not(.ng-gift-icon) {
+  display: none !important;
+}
+
+[data-mj="header-special-button"].ng-gift-button:hover,
+[data-mj="header-special-button"].ng-gift-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255,242,189,.82) !important;
+  filter: brightness(1.12);
+}
+
+[data-mj="header-special-button"].ng-gift-button:active {
+  transform: translateY(0) scale(.96);
+}
+
+.ng-gift-icon {
+  display: block;
+  width: 23px;
+  height: 23px;
+  background: linear-gradient(135deg, #b77b1e, #ffe99d 56%, #d49a2c);
+  -webkit-mask: url("./narcos-gift-icon.png") center / contain no-repeat;
+  mask: url("./narcos-gift-icon.png") center / contain no-repeat;
+  filter: drop-shadow(0 0 7px rgba(242,213,138,.42));
+}
+
+@media (max-width: 620px) {
+  [data-mj="header-special-button"].ng-gift-button {
+    flex-basis: 35px;
+    width: 35px;
+    min-width: 35px !important;
+    height: 34px;
+    min-height: 34px !important;
+    border-radius: 10px !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.10), 0 4px 12px rgba(0,0,0,.24) !important;
+  }
+
+  .ng-gift-icon {
+    width: 20px;
+    height: 20px;
+    filter: none;
+  }
+}
+
 @media (max-width: 360px) {
   [data-mj="game-catalog-module"] {
     padding-inline: 5px !important;

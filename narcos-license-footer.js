@@ -380,6 +380,24 @@
     return true;
   }
 
+  function installHeaderGiftButton() {
+    var button = document.querySelector('[data-mj="header-special-button"]');
+    if (!button) return false;
+
+    button.classList.add("ng-gift-button");
+    button.setAttribute("aria-label", "Hediye ve bonuslar");
+
+    var icon = button.querySelector(".ng-gift-icon");
+    if (!icon) {
+      icon = document.createElement("span");
+      icon.className = "ng-gift-icon";
+      icon.setAttribute("aria-hidden", "true");
+      button.appendChild(icon);
+    }
+
+    return true;
+  }
+
   function shouldShowJackpotWidget() {
     var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
     return /^\/tr\/casino(?:\/|$)/.test(path);
@@ -654,6 +672,7 @@
     installHeaderLicenseBadge();
     installMobileCallButton();
     installHeaderTelegramButton();
+    installHeaderGiftButton();
     installJackpotWidget();
     markMobileSidebar();
     markLeagueWidget();
