@@ -398,6 +398,12 @@
     return true;
   }
 
+  function markCurrentRoute() {
+    var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
+    var isHome = path === "" || path === "/" || path === "/tr";
+    document.documentElement.classList.toggle("ng-home-route", isHome);
+  }
+
   function shouldShowJackpotWidget() {
     var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
     return /^\/tr\/casino(?:\/|$)/.test(path);
@@ -669,6 +675,7 @@
   }
 
   function installInterfaceEnhancements() {
+    markCurrentRoute();
     installHeaderLicenseBadge();
     installMobileCallButton();
     installHeaderTelegramButton();
