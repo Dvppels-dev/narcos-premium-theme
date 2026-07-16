@@ -4455,9 +4455,9 @@ a:focus-visible span[style*="mask"] {
   }
 }
 
-/* Homepage mobile header: reserve a real row for the 32px info strip. */
+/* Mobile info header: reserve a real row on home, casino, live casino and promotions. */
 @media (max-width: 620px) {
-  html.ng-home-route [data-mj="header"] {
+  html.ng-info-safe-route [data-mj="header"] {
     position: relative !important;
     display: flex !important;
     flex-direction: column !important;
@@ -4468,7 +4468,7 @@ a:focus-visible span[style*="mask"] {
     overflow: visible !important;
   }
 
-  html.ng-home-route [data-mj="announcement"] {
+  html.ng-info-safe-route [data-mj="announcement"] {
     position: relative !important;
     inset: auto !important;
     order: -1 !important;
@@ -4478,7 +4478,7 @@ a:focus-visible span[style*="mask"] {
     z-index: 1202 !important;
   }
 
-  html.ng-home-route [data-mj="custom-header"] {
+  html.ng-info-safe-route [data-mj="custom-header"] {
     position: relative !important;
     inset: auto !important;
     order: 1 !important;
@@ -4488,12 +4488,41 @@ a:focus-visible span[style*="mask"] {
     z-index: 1201 !important;
   }
 
-  html.ng-home-route [aria-label="site-header"] {
+  html.ng-info-safe-route [aria-label="site-header"] {
     position: relative !important;
     inset: auto !important;
     top: auto !important;
     transform: none !important;
   }
+}
+
+/* Desktop header spans edge-to-edge; inner content keeps comfortable padding. */
+@media (min-width: 621px) {
+  [data-mj="custom-header"],
+  [data-mj="header-nav-list"] {
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    padding-inline: clamp(18px, 4.5vw, 94px) !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-mj="header"],
+  [aria-label="site-header"],
+  [data-mj="header-nav"] {
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+  }
+}
+
+/* Homepage artwork follows the document instead of staying pinned to the viewport. */
+html.ng-home-route body {
+  min-height: 100% !important;
+  background-position: center top, center top !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-size: cover, cover !important;
+  background-attachment: scroll, scroll !important;
 }
 
 /* Header gift: match the Telegram and call controls on desktop and mobile. */

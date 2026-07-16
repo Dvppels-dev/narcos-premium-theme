@@ -401,7 +401,12 @@
   function markCurrentRoute() {
     var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
     var isHome = path === "" || path === "/" || path === "/tr";
+    var needsSafeInfoHeader = isHome ||
+      /^\/tr\/casino(?:\/|$)/.test(path) ||
+      /^\/tr\/(?:live-casino|livecasino|canli-casino)(?:\/|$)/.test(path) ||
+      /^\/tr\/promotions(?:\/|$)/.test(path);
     document.documentElement.classList.toggle("ng-home-route", isHome);
+    document.documentElement.classList.toggle("ng-info-safe-route", needsSafeInfoHeader);
   }
 
   function shouldShowJackpotWidget() {
