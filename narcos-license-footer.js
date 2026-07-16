@@ -409,7 +409,7 @@
     document.documentElement.classList.toggle("ng-info-safe-route", needsSafeInfoHeader);
   }
 
-  function installGameHubWidget() {
+  function installTrustHubWidget() {
     var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
     var isHome = path === "" || path === "/" || path === "/tr";
     var widget = document.getElementById("narcos-game-hub");
@@ -430,57 +430,73 @@
     if (!widget) {
       widget = document.createElement("section");
       widget.id = "narcos-game-hub";
-      widget.className = "ng-game-hub";
-      widget.setAttribute("aria-labelledby", "narcos-game-hub-title");
+      widget.className = "ng-trust-hub";
+      widget.setAttribute("aria-labelledby", "narcos-trust-hub-title");
 
       var head = document.createElement("div");
-      head.className = "ng-hub-head";
-      head.appendChild(makeText("span", "ng-hub-eyebrow", "NARCOS SELECT"));
+      head.className = "ng-trust-head";
+      head.appendChild(makeText("span", "ng-trust-eyebrow", "NARCOS PREMIUM"));
 
-      var title = makeText("h2", "ng-hub-title", "NARCOS OYUN MERKEZİ");
-      title.id = "narcos-game-hub-title";
+      var title = makeText("h2", "ng-trust-title", "GÜVENİN VE DENEYİMİN ADRESİ");
+      title.id = "narcos-trust-hub-title";
       head.appendChild(title);
-      head.appendChild(makeText("p", "ng-hub-lead", "Oyununu seç, premium deneyime tek dokunuşla geç."));
+      head.appendChild(makeText(
+        "p",
+        "ng-trust-lead",
+        "Güçlü topluluk, köklü deneyim ve her an yanınızda destek."
+      ));
       widget.appendChild(head);
 
-      var links = [
-        { icon: "♠", title: "CASINO", text: "Slot ve masa oyunlarını keşfet", href: "/tr/casino/all" },
-        { icon: "◉", title: "CANLI CASINO", text: "Canlı yayınlı masalara geç", href: "/tr/livecasino" },
-        { icon: "✦", title: "PROMOSYONLAR", text: "Güncel fırsatları incele", href: "/tr/promotions" }
+      var items = [
+        { icon: "members", value: "120.000+", label: "AKTİF ÜYE" },
+        { icon: "experience", value: "10 YILI AŞKIN", label: "DENEYİM" },
+        { icon: "support", value: "7/24", label: "CANLI DESTEK" },
+        { icon: "verified", value: "RESMİ", label: "DOĞRULANMIŞ LİSANS", href: VERIFY_URL }
       ];
 
-      var nav = document.createElement("nav");
-      nav.className = "ng-hub-grid";
-      nav.setAttribute("aria-label", "Oyun merkezi bağlantıları");
+      var grid = document.createElement("div");
+      grid.className = "ng-trust-grid";
+      grid.setAttribute("aria-label", "NarcosBahis güven ve deneyim bilgileri");
 
-      for (var i = 0; i < links.length; i++) {
-        var item = links[i];
-        var link = document.createElement("a");
-        link.className = "ng-hub-card";
-        link.href = item.href;
-        link.setAttribute("aria-label", item.title + ": " + item.text);
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var card = document.createElement(item.href ? "a" : "article");
+        card.className = "ng-trust-card";
 
-        var icon = makeText("span", "ng-hub-icon", item.icon);
+        if (item.href) {
+          card.href = item.href;
+          card.target = "_blank";
+          card.rel = "noopener noreferrer";
+          card.setAttribute("aria-label", item.value + " " + item.label + " doğrulamasını aç");
+        }
+
+        var iconWrap = document.createElement("span");
+        iconWrap.className = "ng-trust-icon-wrap";
+        var icon = document.createElement("span");
+        icon.className = "ng-trust-icon ng-trust-icon-" + item.icon;
         icon.setAttribute("aria-hidden", "true");
-        link.appendChild(icon);
+        iconWrap.appendChild(icon);
+        card.appendChild(iconWrap);
 
         var copy = document.createElement("span");
-        copy.className = "ng-hub-copy";
-        copy.appendChild(makeText("strong", "ng-hub-card-title", item.title));
-        copy.appendChild(makeText("small", "ng-hub-card-text", item.text));
-        link.appendChild(copy);
+        copy.className = "ng-trust-copy";
+        copy.appendChild(makeText("strong", "ng-trust-value", item.value));
+        copy.appendChild(makeText("span", "ng-trust-label", item.label));
+        card.appendChild(copy);
 
-        var arrow = makeText("span", "ng-hub-arrow", "→");
-        arrow.setAttribute("aria-hidden", "true");
-        link.appendChild(arrow);
-        nav.appendChild(link);
+        if (item.href) {
+          var arrow = makeText("span", "ng-trust-arrow", "↗");
+          arrow.setAttribute("aria-hidden", "true");
+          card.appendChild(arrow);
+        }
+        grid.appendChild(card);
       }
 
-      widget.appendChild(nav);
+      widget.appendChild(grid);
       widget.appendChild(makeText(
         "p",
-        "ng-hub-note",
-        "18+ • Eğlence için oynayın • Bütçe ve zaman limitlerinizi belirleyin."
+        "ng-trust-note",
+        "18+ • Sorumlu oyun • Bütçe ve zaman limitlerinizi belirleyin."
       ));
     }
 
@@ -769,7 +785,7 @@
 
   function installInterfaceEnhancements() {
     markCurrentRoute();
-    installGameHubWidget();
+    installTrustHubWidget();
     installHeaderLicenseBadge();
     installMobileCallButton();
     installHeaderTelegramButton();
