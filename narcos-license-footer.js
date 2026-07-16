@@ -382,7 +382,7 @@
 
   function shouldShowJackpotWidget() {
     var path = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
-    return path === "" || path === "/tr" || path.indexOf("/tr/casino") === 0 || path.indexOf("/tr/livecasino") === 0;
+    return /^\/tr\/casino(?:\/|$)/.test(path);
   }
 
   function makeJackpotCard(symbol, label, value, tone) {
