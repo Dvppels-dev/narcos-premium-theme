@@ -4455,73 +4455,6 @@ a:focus-visible span[style*="mask"] {
   }
 }
 
-/* =========================================================
-   2026-07-17 — HEADER OUTER WRAPPERS / CONTINUOUS BACKGROUND
-   ========================================================= */
-
-/* The platform adds an unlabelled max-width wrapper around both header rows. */
-@media (min-width: 621px) {
-  [data-mj="header"] > div:has(> [data-mj="custom-header"]),
-  [data-mj="header-nav"] > div:has([data-mj="header-nav-list"]),
-  [data-mj="header-nav"] > div:has([data-mj="header-nav-list"]) > div {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding-inline: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  [data-mj="custom-header"],
-  [data-mj="header-nav-list"] {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-  }
-}
-
-/* Remove the platform's 56px mobile top reservation; announcement + header = 32px + 60px. */
-@media (max-width: 620px) {
-  html.ng-info-safe-route [data-mj="header"] {
-    gap: 0 !important;
-    row-gap: 0 !important;
-    min-height: 92px !important;
-  }
-
-  html.ng-info-safe-route [data-mj="header"] > div:has(> [data-mj="custom-header"]) {
-    position: relative !important;
-    inset: auto !important;
-    order: 1 !important;
-    flex: 0 0 60px !important;
-    width: 100% !important;
-    max-width: none !important;
-    height: 60px !important;
-    min-height: 60px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-    transform: none !important;
-  }
-
-  html.ng-info-safe-route [data-mj="custom-header"] {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-  }
-}
-
-/* Keep the gold artwork visible through the full document instead of ending after one image. */
-html,
-body {
-  min-height: 100% !important;
-  background-color: #070708 !important;
-}
-
-#root,
-main {
-  min-height: 100% !important;
-  background-color: transparent !important;
-}
-
 /* Mobile info header: reserve a real row on home, casino, live casino and promotions. */
 @media (max-width: 620px) {
   html.ng-info-safe-route [data-mj="header"] {
@@ -4667,12 +4600,4 @@ html.ng-home-route body {
   [data-mj="game-catalog-list"] [data-mj="game-catalog-card"] {
     border-radius: 7px !important;
   }
-}
-
-/* Final background precedence: continue the artwork below every viewport-height section. */
-body,
-html.ng-home-route body {
-  background-repeat: no-repeat, repeat-y !important;
-  background-size: 100% 100%, 100% auto !important;
-  background-attachment: scroll, scroll !important;
 }
