@@ -4823,9 +4823,9 @@ a:focus-visible span[style*="mask"] {
   }
 }
 
-/* Mobile info header: reserve a real row on home, casino, live casino and promotions. */
+/* Mobile info header: reserve a real row on every route, independent of loader timing. */
 @media (max-width: 620px) {
-  html.ng-info-safe-route [data-mj="header"] {
+  [data-mj="header"] {
     position: relative !important;
     display: flex !important;
     flex-direction: column !important;
@@ -4838,7 +4838,7 @@ a:focus-visible span[style*="mask"] {
     overflow: visible !important;
   }
 
-  html.ng-info-safe-route [data-mj="announcement"] {
+  [data-mj="announcement"] {
     position: relative !important;
     inset: auto !important;
     order: -1 !important;
@@ -4848,7 +4848,7 @@ a:focus-visible span[style*="mask"] {
     z-index: 1202 !important;
   }
 
-  html.ng-info-safe-route [data-mj="header"] > div:has(> [data-mj="custom-header"]) {
+  [data-mj="header"] > div:has(> [data-mj="custom-header"]) {
     position: relative !important;
     inset: auto !important;
     top: auto !important;
@@ -4865,7 +4865,7 @@ a:focus-visible span[style*="mask"] {
     z-index: 1201 !important;
   }
 
-  html.ng-info-safe-route [data-mj="custom-header"] {
+  [data-mj="custom-header"] {
     position: relative !important;
     inset: auto !important;
     order: 1 !important;
@@ -4875,7 +4875,7 @@ a:focus-visible span[style*="mask"] {
     z-index: 1201 !important;
   }
 
-  html.ng-info-safe-route [aria-label="site-header"] {
+  [data-mj="header"] [aria-label="site-header"] {
     position: relative !important;
     inset: auto !important;
     top: auto !important;
