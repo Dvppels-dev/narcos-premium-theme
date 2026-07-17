@@ -513,8 +513,13 @@ body::before {
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
+  filter: none;
+  animation: none;
+}
+
+html.ng-effects-ready [data-mj="widget-multi-banner-slider"]::before {
   filter: drop-shadow(0 0 4px rgba(242,213,138,.95)) drop-shadow(0 0 10px rgba(201,152,67,.68));
-  animation: ng-slider-neon-sweep 4.2s linear infinite;
+  animation: ng-slider-neon-sweep 6.8s linear infinite;
 }
 
 [data-mj="widget-multi-banner-slider"]::after {
@@ -674,7 +679,12 @@ body::before {
       transparent 296deg 360deg
     );
     filter: drop-shadow(0 0 7px rgba(242,213,138,.55));
-    animation: ng-game-card-neon-spin 3.8s linear infinite;
+    animation: none;
+  }
+
+  html.ng-effects-ready [data-mj="game-catalog-card"]:hover::before,
+  html.ng-effects-ready [data-mj="game-catalog-card"]:focus-within::before {
+    animation: ng-game-card-neon-spin 4.8s linear infinite;
   }
 
   [data-mj="game-catalog-card"]::after {
@@ -2440,7 +2450,7 @@ body::after {
     linear-gradient(110deg, #8f6424, #fff2bd, #c99843, #8f6424) border-box;
   background-size: 100% 100%, 300% 100%;
   box-shadow: 0 18px 48px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,242,189,.09);
-  animation: ng-trust-border 7s linear infinite;
+  animation: none;
 }
 
 #narcos-game-hub::before {
@@ -2515,7 +2525,17 @@ body::after {
   pointer-events: none;
   background: linear-gradient(105deg, transparent 42%, rgba(255,242,189,.20) 50%, transparent 58%);
   transform: translateX(-58%);
-  animation: ng-trust-shine 6.2s ease-in-out infinite;
+  animation: none;
+}
+
+@media (min-width: 621px) {
+  html.ng-effects-ready #narcos-game-hub {
+    animation: ng-trust-border 9s linear infinite;
+  }
+
+  html.ng-effects-ready .ng-trust-card::after {
+    animation: ng-trust-shine 7.5s ease-in-out infinite;
+  }
 }
 
 a.ng-trust-card:hover,
@@ -3977,7 +3997,11 @@ a:focus-visible span[style*="mask"] {
 
 [data-mj="header-left"] [data-mj="logo"] img {
   transform-origin: center center !important;
-  animation: ng-logo-premium-shine 5.4s ease-in-out infinite !important;
+  animation: none !important;
+}
+
+html.ng-effects-ready [data-mj="header-left"] [data-mj="logo"] img {
+  animation: ng-logo-premium-shine 7s ease-in-out infinite !important;
 }
 
 @media (max-width: 620px) {
@@ -5003,5 +5027,59 @@ html.ng-home-route body {
 
   [data-mj="game-catalog-list"] [data-mj="game-catalog-card"] {
     border-radius: 7px !important;
+  }
+}
+
+/* =========================================================
+   2026-07-18: first-paint and runtime performance pass
+   ========================================================= */
+
+/* Keep a single full-viewport artwork layer. The earlier body background and
+   body::after used the same file, causing two full-screen paints. */
+body {
+  background-image: none !important;
+  background-attachment: initial !important;
+}
+
+body::after {
+  will-change: auto;
+}
+
+/* Below-fold custom content is laid out only as it approaches the viewport. */
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
+#narcos-game-hub,
+#narcos-values-panel,
+#narcos-social-panel,
+#narcos-license-banner {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 260px;
+}
+
+@media (max-width: 620px) {
+  [data-mj="announcement"],
+  [data-mj="custom-header"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  [data-mj="game-catalog-card"]::before,
+  #narcos-game-hub,
+  .ng-trust-card::after {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.ng-effects-ready [data-mj="widget-multi-banner-slider"]::before,
+  html.ng-effects-ready [data-mj="game-catalog-card"]::before,
+  html.ng-effects-ready [data-mj="header-left"] [data-mj="logo"] img,
+  html.ng-effects-ready #narcos-game-hub,
+  html.ng-effects-ready .ng-trust-card::after {
+    animation: none !important;
+    filter: none !important;
   }
 }
