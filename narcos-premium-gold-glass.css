@@ -4848,6 +4848,23 @@ a:focus-visible span[style*="mask"] {
     z-index: 1202 !important;
   }
 
+  [data-mj="header"] > div:has(> [data-mj="announcement"]) {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    order: -1 !important;
+    flex: 0 0 32px !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    z-index: 1202 !important;
+  }
+
   [data-mj="header"] > div:has(> [data-mj="custom-header"]) {
     position: relative !important;
     inset: auto !important;
