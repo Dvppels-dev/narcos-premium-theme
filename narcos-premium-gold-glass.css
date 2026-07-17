@@ -2430,7 +2430,7 @@ body::after {
   isolation: isolate;
   overflow: hidden;
   box-sizing: border-box;
-  width: min(calc(100% - 32px), 1760px);
+  width: min(calc(100% - 32px), 1432px);
   margin: 18px auto 24px;
   padding: clamp(17px, 2vw, 27px);
   border: 1px solid transparent;
@@ -4829,6 +4829,8 @@ a:focus-visible span[style*="mask"] {
     position: relative !important;
     display: flex !important;
     flex-direction: column !important;
+    gap: 0 !important;
+    row-gap: 0 !important;
     width: 100% !important;
     height: auto !important;
     min-height: 92px !important;
@@ -4844,6 +4846,23 @@ a:focus-visible span[style*="mask"] {
     width: 100% !important;
     transform: none !important;
     z-index: 1202 !important;
+  }
+
+  html.ng-info-safe-route [data-mj="header"] > div:has(> [data-mj="custom-header"]) {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    order: 0 !important;
+    flex: 0 0 60px !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    z-index: 1201 !important;
   }
 
   html.ng-info-safe-route [data-mj="custom-header"] {
