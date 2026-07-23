@@ -781,7 +781,7 @@ footer::before,
     overflow: visible !important;
     z-index: 1150 !important;
   }
-  [data-mj="header"] > div:has(> [data-mj="announcement"]),
+  [data-mj="header"] > :has([data-mj="announcement"]),
   [data-mj="header"] > [data-mj="announcement"] {
     position: relative !important;
     inset: auto !important;
@@ -797,11 +797,20 @@ footer::before,
     transform: none !important;
     box-sizing: border-box !important;
   }
-  [data-mj="header"] > div:has(> [data-mj="announcement"]) > [data-mj="announcement"],
-  [data-mj="header"] > [data-mj="announcement"] {
+  [data-mj="header"] [data-mj="announcement"] {
+    position: relative !important;
+    inset: auto !important;
     display: flex !important;
+    flex: 0 0 32px !important;
     width: 100% !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    margin: 0 !important;
     padding: 0 34px 0 8px !important;
+    overflow: hidden !important;
+    transform: none !important;
+    box-sizing: border-box !important;
   }
   [data-mj="announcement"] > div,
   [data-mj="announcement"] > div > div:first-child,
@@ -818,8 +827,8 @@ footer::before,
   }
   [data-mj="announcement"] p br { display: none; }
   [data-mj="announcement"] button[aria-label="close"] { right: 4px !important; width: 24px !important; height: 24px !important; }
-  [data-mj="header"] > div:has(> [data-mj="custom-header"]),
-  [data-mj="custom-header"] {
+  [data-mj="header"] > :has([data-mj="custom-header"]),
+  [data-mj="header"] > [data-mj="custom-header"] {
     position: relative !important;
     inset: auto !important;
     order: 0 !important;
@@ -829,6 +838,15 @@ footer::before,
     min-height: 60px !important;
     margin: 0 !important;
     padding: 0 !important;
+    transform: none !important;
+  }
+  [data-mj="header"] [data-mj="custom-header"] {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    margin: 0 !important;
     transform: none !important;
   }
   [aria-label="site-header"] {
@@ -889,19 +907,24 @@ footer::before,
   main[data-mj="page-content"]:not(:has(iframe)) { flex: 0 0 auto !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
   main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
     position: relative !important;
-    flex: 1 0 calc(100svh - 32px) !important;
+    flex: 0 0 auto !important;
     width: 100% !important;
-    height: calc(100svh - 32px) !important;
-    min-height: max(560px, calc(100svh - 32px)) !important;
+    height: max(420px, calc(100vh - 104px - env(safe-area-inset-bottom, 0px))) !important;
+    height: max(420px, calc(100dvh - 104px - env(safe-area-inset-bottom, 0px))) !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
+  }
+  [data-mj="header"]:has([data-mj="custom-header"]) ~ main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
+    height: max(420px, calc(100vh - 164px - env(safe-area-inset-bottom, 0px))) !important;
+    height: max(420px, calc(100dvh - 164px - env(safe-area-inset-bottom, 0px))) !important;
   }
   main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) > div {
     position: relative !important;
     width: 100% !important;
     height: 100% !important;
-    min-height: inherit !important;
+    min-height: 0 !important;
     margin: 0 !important;
   }
   main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) iframe {
@@ -910,7 +933,7 @@ footer::before,
     display: block !important;
     width: 100% !important;
     height: 100% !important;
-    min-height: 100% !important;
+    min-height: 0 !important;
     border: 0 !important;
     opacity: 1 !important;
     visibility: visible !important;
