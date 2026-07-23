@@ -114,6 +114,49 @@ main [role="textbox"]:focus {
   animation: none !important;
   font-weight: 850 !important;
 }
+.ng-info-strip {
+  position: relative !important;
+  z-index: 4;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 44px !important;
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 48px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  border-bottom: 1px solid rgba(242, 213, 138, .27) !important;
+  background:
+    radial-gradient(circle at 50% -100%, rgba(242, 213, 138, .2), transparent 68%),
+    linear-gradient(110deg, rgba(8, 8, 11, .94), rgba(34, 29, 21, .86), rgba(8, 8, 11, .94)) !important;
+  box-shadow: inset 0 -1px rgba(255, 255, 255, .025), 0 7px 22px rgba(0, 0, 0, .22);
+}
+.ng-info-strip-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  color: var(--ng-gold-3) !important;
+  font-size: clamp(11px, .82vw, 14px) !important;
+  font-weight: 750 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  text-shadow: 0 0 14px rgba(242, 213, 138, .2);
+}
+.ng-info-source {
+  color: #fff !important;
+  font-weight: 900 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+}
+.ng-info-separator { padding-inline: 8px; color: rgba(242, 213, 138, .65) !important; }
+.ng-info-current { color: #fff4c7 !important; font-weight: 900 !important; }
 [data-mj="announcement"] button[aria-label="close"] {
   position: absolute !important; top: 50% !important; right: 10px !important; z-index: 3;
   transform: translateY(-50%) !important;
@@ -781,6 +824,21 @@ footer::before,
     overflow: visible !important;
     z-index: 1150 !important;
   }
+  .ng-info-strip {
+    order: -2 !important;
+    flex: 0 0 32px !important;
+    width: 100% !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 0 8px !important;
+  }
+  .ng-info-strip-content {
+    font-size: clamp(8px, 2.35vw, 10px) !important;
+    letter-spacing: -.015em !important;
+  }
+  .ng-info-long { display: none !important; }
+  .ng-info-separator { padding-inline: 5px; }
   [data-mj="header"] > :has([data-mj="announcement"]),
   [data-mj="header"] > [data-mj="announcement"] {
     position: relative !important;
@@ -1069,6 +1127,46 @@ footer::before,
     text-overflow: clip !important;
     white-space: nowrap !important;
   }
+  html.ng-game-embed,
+  html.ng-game-embed body {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  html.ng-game-embed #root {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100svh !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  html.ng-game-embed [data-mj="header"] { flex: 0 0 auto !important; }
+  html.ng-game-embed main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  html.ng-game-embed main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) > * {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+  html.ng-game-embed [data-mj="bottom-nav"] {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+  html.ng-game-embed [data-mj="footer"],
+  html.ng-game-embed footer { display: none !important; }
   #narcos-game-hub { width: calc(100% - 24px); margin: 12px auto 18px; padding: 14px 10px; border-radius: 18px; }
   .ng-trust-head { margin-bottom: 11px; }
   .ng-trust-title { font-size: 17px !important; }
@@ -1113,6 +1211,10 @@ footer::before,
   [data-mj="widget-game-card"],
   [data-mj="game-catalog-card"],
   #narcos-social-panel { backdrop-filter: none !important; }
+}
+html.ng-theme-info-mounted [data-mj="header"]:has(#narcos-info-strip) [data-mj="announcement"],
+html.ng-theme-info-mounted [data-mj="header"]:has(#narcos-info-strip) > :has([data-mj="announcement"]):not(:has([data-mj="custom-header"])) {
+  display: none !important;
 }
 /* ---------------- SMALL MOBILE ---------------- */
 @media (max-width: 360px) {

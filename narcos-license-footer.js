@@ -2,7 +2,7 @@
    Keeps the current public DOM contract while avoiding destructive SPA patches. */
 (function () {
   "use strict";
-  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.0.0";
+  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.1.1";
   var previous = window[GLOBAL_KEY];
   if (previous && previous.version === VERSION && previous.refresh) {
     previous.refresh();
@@ -11,7 +11,7 @@
   if (previous && previous.destroy) previous.destroy();
   var VERIFY_URL = "https://verification.anjouangamblingboard.org/s/140e70a801efff238b59b01782ba34d909755fd6e27deb06c4959b328d6e9698e01f00b62578604eca16f199ebb446cb";
   var TELEGRAM_URL = "https://t.me/narcosresmi", CURRENT_URL = "https://narcosgir.com";
-  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v2";
+  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v3";
   function getBaseUrl() {
     var script = document.currentScript || document.querySelector('script[src*="narcos-license-footer"]');
     var source = script && script.src;
@@ -33,7 +33,8 @@
   };
   var runtime = {
     version: VERSION,
-    observer: null, listeners: [], history: [], path: "", route: null,
+    observer: null, resizeObserver: null, observedShellNodes: [],
+    listeners: [], history: [], path: "", route: null,
     campaignMain: null, campaignTitle: "", generatedTitle: "",
     criticalFrame: 0, deferredHandle: 0, deferredKind: "",
     effectsHandle: 0, effectsKind: "",
@@ -62,6 +63,7 @@
   }
   function place(parent, node, before) {
     before = before || null;
+    if (node === before) return node;
     if (node.parentElement !== parent || node.nextSibling !== before) parent.insertBefore(node, before);
     return node;
   }
@@ -91,6 +93,86 @@
       infoSafe: home || /^\/tr\/casino(?:\/|$)/.test(path) || liveCasino || promotion,
       campaign: campaignRoute(path)
     };
+  }
+  function observeShellNode(node) {
+    if (!node || !runtime.resizeObserver || runtime.observedShellNodes.indexOf(node) !== -1) return;
+    runtime.observedShellNodes.push(node);
+    runtime.resizeObserver.observe(node);
+  }
+  function pruneShellNodes() {
+    for (var i = runtime.observedShellNodes.length - 1; i >= 0; i -= 1) {
+      if (runtime.observedShellNodes[i].isConnected) continue;
+      if (runtime.resizeObserver) runtime.resizeObserver.unobserve(runtime.observedShellNodes[i]);
+      runtime.observedShellNodes.splice(i, 1);
+    }
+  }
+  function activeHeader() {
+    var headers = document.querySelectorAll('[data-mj="header"]');
+    var fallback = headers.length ? headers[headers.length - 1] : null;
+    for (var i = headers.length - 1; i >= 0; i -= 1) {
+      var style = window.getComputedStyle(headers[i]);
+      var rect = headers[i].getBoundingClientRect();
+      if (style.display !== "none" && style.visibility !== "hidden" && rect.width > 0) return headers[i];
+    }
+    return fallback;
+  }
+  function renderInfoStrip() {
+    var header = activeHeader();
+    if (!header) {
+      document.documentElement.classList.remove("ng-theme-info-mounted");
+      return false;
+    }
+    var host = (window.location.hostname || "narcosbahis.com").replace(/^www\./i, "");
+    observeShellNode(header);
+    mount("narcos-info-strip", "aside", header, header.firstElementChild, function (strip) {
+      strip.className = "ng-info-strip";
+      strip.setAttribute("aria-label", "Güncel giriş adresi");
+      var content = create("div", "ng-info-strip-content");
+      content.appendChild(externalLink(CURRENT_URL, "ng-info-source", "narcosgir.com", "NarcosBahis güncel giriş sayfasını aç"));
+      content.appendChild(create("span", "ng-info-long", " adresinden her zaman güncel adresimize ulaşabilirsiniz."));
+      content.appendChild(create("span", "ng-info-separator", " • "));
+      content.appendChild(create("span", "ng-info-current-label", "Güncel giriş: "));
+      content.appendChild(create("strong", "ng-info-current", host));
+      strip.appendChild(content);
+    });
+    document.documentElement.classList.add("ng-theme-info-mounted");
+    return true;
+  }
+  function syncEmbeddedGameState() {
+    var main = query('main[data-mj="page-content"]');
+    var frames = main ? main.querySelectorAll("iframe") : [];
+    var frame = null;
+    for (var i = 0; i < frames.length; i += 1) {
+      if (frames[i].id === "phoenix365ifraim") continue;
+      if (frames[i].closest && frames[i].closest("#sportsbook-wrapper")) continue;
+      var source = (frames[i].getAttribute("src") || "").trim();
+      if (!source || /^about:blank(?:#|$)/i.test(source)) continue;
+      if (/(?:captcha|recaptcha|hcaptcha|turnstile|youtube|vimeo|verification|live-chat)/i.test(source)) continue;
+      observeShellNode(frames[i]);
+      var style = window.getComputedStyle(frames[i]);
+      var rect = frames[i].getBoundingClientRect();
+      if (style.display === "none" || style.visibility === "hidden") continue;
+      if (rect.width < 160 || rect.height < 120) {
+        if (frames[i].getAttribute("data-ng-frame-probe") !== REVISION) {
+          frames[i].setAttribute("data-ng-frame-probe", REVISION);
+          window.setTimeout(function () {
+            if (window[GLOBAL_KEY] === runtime) queueCritical(["shell"]);
+          }, 120);
+        }
+        continue;
+      }
+      frame = frames[i];
+      break;
+    }
+    var active = !!frame && !(runtime.route && runtime.route.sports);
+    document.documentElement.classList.toggle("ng-game-embed", active);
+    return active;
+  }
+  function renderShell() {
+    pruneShellNodes();
+    renderInfoStrip();
+    syncEmbeddedGameState();
+    return true;
   }
   function listen(target, type, handler, options) {
     target.addEventListener(type, handler, options); runtime.listeners.push([target, type, handler, options]);
@@ -543,7 +625,7 @@
     document.documentElement.classList.toggle("ng-sports-route", runtime.route.sports);
   }
   var JOBS = {
-    header: renderHeader, campaign: renderCampaign, trust: renderTrustHub,
+    shell: renderShell, header: renderHeader, campaign: renderCampaign, trust: renderTrustHub,
     jackpot: renderJackpot, sidebar: markMobileSidebar,
     leagues: markLeagueWidget, footer: renderFooter
   };
@@ -583,7 +665,8 @@
     if (!force && path === runtime.path) return;
     runtime.path = path; runtime.route = classifyRoute(path);
     applyRouteClasses();
-    queueCritical(["campaign"]);
+    renderShell();
+    queueCritical(["shell", "campaign"]);
     queueDeferred(["trust", "jackpot"], 700);
   }
   function matchesWithin(node, selector) {
@@ -596,6 +679,7 @@
       !!(node.closest && node.closest('[id^="narcos-"]'));
   }
   var WATCHERS = [
+    { selector: '[data-mj="header"],[data-mj="announcement"],main[data-mj="page-content"] iframe,[data-mj="bottom-nav"]', critical: ["shell"] },
     { selector: '[aria-label="site-header"],[data-mj="header-left"],[data-mj="header-right"],[data-mj="header-special-button"]', critical: ["header"] },
     { selector: 'main,[data-mj="page-content"]', critical: ["campaign"], deferred: ["trust", "jackpot"] },
     { selector: '[data-mj="mobile-nav-list"]', deferred: ["sidebar"] }, { selector: '[data-mj="widget-collection-slider"]', deferred: ["leagues"] },
@@ -604,10 +688,15 @@
   function observeMutations(records) {
     var critical = Object.create(null), deferred = Object.create(null);
     records.forEach(function (record) {
+      if (record.type === "attributes" && record.target && record.target.matches && record.target.matches("iframe")) {
+        critical.shell = true;
+        return;
+      }
       var shouldReconcile = false;
       Array.prototype.forEach.call(record.addedNodes, function (node) {
         if (isOwnNode(node)) return;
         shouldReconcile = true;
+        if (matchesWithin(node, 'main[data-mj="page-content"],iframe')) critical.shell = true;
         if (matchesWithin(node, '[data-mj="game-catalog-provider-bottom-sheet-search"]')) localizeProviderSheet();
         WATCHERS.forEach(function (watcher) {
           if (!matchesWithin(node, watcher.selector)) return;
@@ -617,6 +706,9 @@
       });
       Array.prototype.forEach.call(record.removedNodes, function (node) {
         if (node && (node.nodeType === 1 || node.nodeType === 3)) shouldReconcile = true;
+        if (matchesWithin(node, 'main[data-mj="page-content"],main[data-mj="page-content"] iframe,iframe')) {
+          critical.shell = true;
+        }
       });
       if (!shouldReconcile || !record.target || record.target.nodeType !== 1) return;
       WATCHERS.forEach(function (watcher) {
@@ -628,6 +720,10 @@
         (watcher.deferred || []).forEach(function (name) { deferred[name] = true; });
       });
     });
+    if (critical.shell) {
+      delete critical.shell;
+      renderShell();
+    }
     var criticalNames = Object.keys(critical), deferredNames = Object.keys(deferred);
     if (criticalNames.length) queueCritical(criticalNames);
     if (deferredNames.length) queueDeferred(deferredNames, 700);
@@ -683,6 +779,7 @@
   function refresh() {
     runtime.path = cleanPath(); runtime.route = classifyRoute(runtime.path);
     applyRouteClasses();
+    renderShell();
     renderHeader();
     localizeProviderSheet();
     renderCampaign();
@@ -690,6 +787,7 @@
   }
   function destroy() {
     if (runtime.observer) runtime.observer.disconnect();
+    if (runtime.resizeObserver) runtime.resizeObserver.disconnect();
     runtime.listeners.forEach(function (entry) { entry[0].removeEventListener(entry[1], entry[2], entry[3]); });
     runtime.history.forEach(function (entry) {
       if (window.history[entry[0]] === entry[2]) window.history[entry[0]] = entry[1];
@@ -703,6 +801,9 @@
     if (runtime.effectsHandle && runtime.effectsKind === "idle" && window.cancelIdleCallback) window.cancelIdleCallback(runtime.effectsHandle);
     else if (runtime.effectsHandle) window.clearTimeout(runtime.effectsHandle);
     restoreCampaignHost();
+    document.documentElement.classList.remove("ng-game-embed", "ng-theme-info-mounted");
+    var infoStrip = document.getElementById("narcos-info-strip");
+    if (infoStrip) infoStrip.remove();
     if (window[GLOBAL_KEY] === runtime) delete window[GLOBAL_KEY];
   }
   runtime.refresh = refresh;
@@ -711,8 +812,18 @@
   listen(window, "popstate", function () { handleRouteChange(false); });
   listen(window, "hashchange", function () { handleRouteChange(false); });
   listen(document, "click", onDocumentClick, true);
+  if (window.ResizeObserver) {
+    runtime.resizeObserver = new ResizeObserver(function () {
+      if (window[GLOBAL_KEY] === runtime) renderShell();
+    });
+  }
   refresh();
   scheduleEffectsReady();
   runtime.observer = new MutationObserver(observeMutations);
-  runtime.observer.observe(document.documentElement, { childList: true, subtree: true });
+  runtime.observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["src"]
+  });
 })();
