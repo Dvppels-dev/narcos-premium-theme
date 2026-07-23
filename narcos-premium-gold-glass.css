@@ -75,7 +75,7 @@ main [role="textbox"]:focus {
 /* ---------------- ANNOUNCEMENT / HEADER / ACTIONS ---------------- */
 [data-mj="announcement"] {
   position: relative !important; isolation: isolate;
-  display: flex !important; align-items: center !important; justify-content: center !important;
+  display: flex; align-items: center !important; justify-content: center !important;
   min-height: 60px; padding: 10px 52px !important;
   box-sizing: border-box !important;
   border-bottom: 1px solid rgba(242, 213, 138, .26);
@@ -777,12 +777,12 @@ footer::before,
     gap: 0 !important;
     width: 100% !important;
     height: auto !important;
-    min-height: 92px !important;
+    min-height: 0 !important;
     overflow: visible !important;
     z-index: 1150 !important;
   }
   [data-mj="header"] > div:has(> [data-mj="announcement"]),
-  [data-mj="announcement"] {
+  [data-mj="header"] > [data-mj="announcement"] {
     position: relative !important;
     inset: auto !important;
     order: -1 !important;
@@ -792,10 +792,16 @@ footer::before,
     min-height: 32px !important;
     max-height: 32px !important;
     margin: 0 !important;
-    padding: 0 34px 0 8px !important;
+    padding: 0 !important;
     overflow: hidden !important;
     transform: none !important;
     box-sizing: border-box !important;
+  }
+  [data-mj="header"] > div:has(> [data-mj="announcement"]) > [data-mj="announcement"],
+  [data-mj="header"] > [data-mj="announcement"] {
+    display: flex !important;
+    width: 100% !important;
+    padding: 0 34px 0 8px !important;
   }
   [data-mj="announcement"] > div,
   [data-mj="announcement"] > div > div:first-child,
@@ -880,7 +886,35 @@ footer::before,
   .ng-gift-icon { width: 18px; height: 18px; filter: none; }
   .ng-header-license { flex: 0 0 30px; width: 30px; height: 32px; }
   .ng-header-license-image { width: 30px; height: 30px; }
-  main[data-mj="page-content"] { flex: 0 0 auto !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  main[data-mj="page-content"]:not(:has(iframe)) { flex: 0 0 auto !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
+    position: relative !important;
+    flex: 1 0 calc(100svh - 32px) !important;
+    width: 100% !important;
+    height: calc(100svh - 32px) !important;
+    min-height: max(560px, calc(100svh - 32px)) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) > div {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: inherit !important;
+    margin: 0 !important;
+  }
+  main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) iframe {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    border: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
   [data-mj="widget-multi-banner"] { width: 100% !important; padding-inline: 12px !important; box-sizing: border-box !important; }
   [data-mj="widget-multi-banner-slider"] {
     width: 100% !important;
@@ -931,6 +965,17 @@ footer::before,
   html.ng-sports-route #root { padding-top: 0 !important; overflow: visible !important; }
   html.ng-sports-route [data-mj="header"] { position: sticky !important; top: 0 !important; }
   html.ng-sports-route [data-mj="page-content"] { padding-top: 0 !important; margin-top: 0 !important; min-height: calc(100svh - 118px) !important; }
+  html.ng-sports-route [data-mj="page-content"] > div:has(#sportsbook-wrapper),
+  html.ng-sports-route [data-mj="page-content"] > div > div:has(#sportsbook-wrapper) {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
   html.ng-sports-route #sportsbook-wrapper { width: 100% !important; height: max(560px, calc(100svh - 132px)) !important; min-height: 560px !important; margin: 0 !important; border-radius: 0 !important; }
   .ng-sidebar-root,
   .ng-sidebar-drawer,
@@ -945,10 +990,62 @@ footer::before,
   [data-mj="mobile-nav-list"].ng-sidebar-nav [data-mj="nav-item"] span[style*="mask"] { flex: 0 0 24px !important; width: 24px !important; height: 24px !important; color: var(--ng-gold-3) !important; background-color: var(--ng-gold-3) !important; opacity: 1 !important; }
   [data-mj="bottom-nav"] { width: 100vw !important; max-width: 100vw !important; padding-bottom: 72px !important; overflow: hidden !important; }
   [data-mj="bottom-nav"] > * { left: 8px !important; right: 8px !important; bottom: 8px !important; display: flex !important; height: 56px !important; overflow: hidden !important; border: 1px solid rgba(242, 213, 138, .28) !important; border-radius: 18px !important; background: rgba(16, 16, 21, .94) !important; }
-  [data-mj="bottom-nav-item"] { display: flex !important; flex: 1 1 0 !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 3px !important; min-width: 0 !important; height: 54px !important; padding: 5px 1px !important; text-align: center !important; }
-  [data-mj="bottom-nav-item"] > span:first-child { flex: 0 0 21px !important; width: 21px !important; height: 21px !important; margin: 0 auto !important; background-color: var(--ng-gold-3) !important; }
-  [data-mj="bottom-nav-item"] > span:last-child,
-  [data-mj="bottom-nav-item"] p { width: 100% !important; overflow: visible !important; color: rgba(247, 243, 232, .82) !important; font-size: clamp(6.8px, 1.85vw, 7.4px) !important; line-height: 1.1 !important; letter-spacing: -.035em !important; text-overflow: clip !important; white-space: nowrap !important; transform: scaleX(.82); }
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+    height: 54px !important;
+    padding: 5px 1px !important;
+    overflow: hidden !important;
+    color: rgba(247, 243, 232, .82) !important;
+    text-align: center !important;
+    font-size: clamp(6.8px, 1.85vw, 7.4px) !important;
+    line-height: 1.1 !important;
+    letter-spacing: -.035em !important;
+    white-space: nowrap !important;
+  }
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] > span:first-child {
+    flex: 0 0 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    max-width: 20px !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+    margin: 0 auto !important;
+    background-color: var(--ng-gold-3) !important;
+    -webkit-mask-position: center !important;
+    mask-position: center !important;
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+    -webkit-mask-size: contain !important;
+    mask-size: contain !important;
+    transform: none !important;
+  }
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] > span:first-child :is(svg, img),
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] > :is(svg, img) {
+    width: 20px !important;
+    min-width: 20px !important;
+    max-width: 20px !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+    object-fit: contain !important;
+  }
+  [data-mj="bottom-nav"] [data-mj="bottom-nav-item"] p {
+    width: 100% !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    color: inherit !important;
+    font: inherit !important;
+    line-height: inherit !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
   #narcos-game-hub { width: calc(100% - 24px); margin: 12px auto 18px; padding: 14px 10px; border-radius: 18px; }
   .ng-trust-head { margin-bottom: 11px; }
   .ng-trust-title { font-size: 17px !important; }
