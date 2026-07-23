@@ -238,6 +238,52 @@ main [role="textbox"]:focus {
 .ng-call-button:hover,
 .ng-telegram-button:hover,
 [data-mj="header-special-button"].ng-gift-button:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.ng-game-return {
+  display: none !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  gap: 7px;
+  height: 40px;
+  min-height: 40px !important;
+  min-width: 0;
+  padding: 0 12px !important;
+  box-sizing: border-box;
+  color: #fff4c7 !important;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: .01em;
+  border: 1px solid rgba(242, 213, 138, .58) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, rgba(201, 152, 67, .24), rgba(10, 10, 13, .92)) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .14), 0 7px 20px rgba(0, 0, 0, .28), 0 0 16px rgba(201, 152, 67, .1) !important;
+  cursor: pointer;
+}
+html.ng-game-embed .ng-game-return { display: inline-flex !important; }
+html:not(.ng-game-embed) .ng-game-return { display: none !important; }
+.ng-game-return-icon {
+  flex: 0 0 auto;
+  color: var(--ng-gold-3);
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+}
+.ng-game-return:hover,
+.ng-game-return:focus-visible {
+  border-color: rgba(255, 242, 189, .9) !important;
+  background: linear-gradient(145deg, rgba(242, 213, 138, .32), rgba(17, 15, 13, .95)) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .2), 0 0 20px rgba(201, 152, 67, .22) !important;
+}
+.ng-game-return:active { transform: translateY(1px); }
+html.ng-game-embed [data-mj="bottom-nav"],
+html.ng-game-embed [data-mj="bottom-nav"] > *,
+html.ng-game-embed [data-mj="bottom-nav-item"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
 .ng-call-icon {
   display: block; width: 20px; height: 20px; padding: 3px;
   border-radius: 7px;
@@ -960,10 +1006,25 @@ footer::before,
   .ng-call-icon,
   .ng-telegram-icon,
   .ng-gift-icon { width: 18px; height: 18px; filter: none; }
+  html.ng-game-embed [data-mj="header-right"] { gap: 3px !important; }
+  html.ng-game-embed .ng-gift-button,
+  html.ng-game-embed .ng-telegram-button,
+  html.ng-game-embed .ng-call-button { display: none !important; }
+  html.ng-game-embed .ng-game-return {
+    height: 32px;
+    min-height: 32px !important;
+    max-width: 108px;
+    gap: 5px;
+    padding: 0 8px !important;
+    border-radius: 10px !important;
+    font-size: clamp(9px, 2.5vw, 10px);
+    letter-spacing: -.01em;
+  }
+  html.ng-game-embed .ng-game-return-icon { font-size: 15px; }
   .ng-header-license { flex: 0 0 30px; width: 30px; height: 32px; }
   .ng-header-license-image { width: 30px; height: 30px; }
   main[data-mj="page-content"]:not(:has(iframe)) { flex: 0 0 auto !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
-  main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
+  html.ng-game-embed main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
     position: relative !important;
     flex: 0 0 auto !important;
     width: 100% !important;
@@ -974,27 +1035,17 @@ footer::before,
     padding: 0 !important;
     overflow: hidden !important;
   }
-  [data-mj="header"]:has([data-mj="custom-header"]) ~ main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
+  html.ng-game-embed [data-mj="header"]:has([data-mj="custom-header"]) ~ main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
     height: max(420px, calc(100vh - 164px - env(safe-area-inset-bottom, 0px))) !important;
     height: max(420px, calc(100dvh - 164px - env(safe-area-inset-bottom, 0px))) !important;
   }
-  main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) > div {
-    position: relative !important;
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-  }
-  main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) iframe {
+  html.ng-game-embed iframe[data-ng-active-game-frame="true"] {
     position: absolute !important;
     inset: 0 !important;
-    display: block !important;
     width: 100% !important;
     height: 100% !important;
     min-height: 0 !important;
     border: 0 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
   }
   [data-mj="widget-multi-banner"] { width: 100% !important; padding-inline: 12px !important; box-sizing: border-box !important; }
   [data-mj="widget-multi-banner-slider"] {
@@ -1151,10 +1202,10 @@ footer::before,
     padding: 0 !important;
     overflow: hidden !important;
   }
-  html.ng-game-embed main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) > * {
+  :where(html.ng-game-embed [data-ng-active-game-host="true"]) {
     position: relative !important;
     width: 100% !important;
-    height: 100% !important;
+    height: 100%;
     min-height: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;

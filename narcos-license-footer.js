@@ -2,7 +2,7 @@
    Keeps the current public DOM contract while avoiding destructive SPA patches. */
 (function () {
   "use strict";
-  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.1.1";
+  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.2.0";
   var previous = window[GLOBAL_KEY];
   if (previous && previous.version === VERSION && previous.refresh) {
     previous.refresh();
@@ -11,7 +11,7 @@
   if (previous && previous.destroy) previous.destroy();
   var VERIFY_URL = "https://verification.anjouangamblingboard.org/s/140e70a801efff238b59b01782ba34d909755fd6e27deb06c4959b328d6e9698e01f00b62578604eca16f199ebb446cb";
   var TELEGRAM_URL = "https://t.me/narcosresmi", CURRENT_URL = "https://narcosgir.com";
-  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v3";
+  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v4";
   function getBaseUrl() {
     var script = document.currentScript || document.querySelector('script[src*="narcos-license-footer"]');
     var source = script && script.src;
@@ -34,7 +34,11 @@
   var runtime = {
     version: VERSION,
     observer: null, resizeObserver: null, observedShellNodes: [],
+    frameHosts: typeof WeakSet === "function" ? new WeakSet() : null,
+    frameStates: typeof WeakMap === "function" ? new WeakMap() : null,
     listeners: [], history: [], path: "", route: null,
+    gameActive: false, gameReturnUrl: "", pendingGameReturnUrl: "", pendingGameReturnAt: 0, lastSafeUrl: "",
+    activeGameFrame: null, activeGameHosts: [],
     campaignMain: null, campaignTitle: "", generatedTitle: "",
     criticalFrame: 0, deferredHandle: 0, deferredKind: "",
     effectsHandle: 0, effectsKind: "",
@@ -106,6 +110,22 @@
       runtime.observedShellNodes.splice(i, 1);
     }
   }
+  function observeFrameLifecycle(frame, main) {
+    observeShellNode(frame);
+    if (runtime.frameStates && !runtime.frameStates.has(frame)) {
+      runtime.frameStates.set(frame, { expanded: false });
+    }
+    if (!runtime.frameHosts) return;
+    var node = frame && frame.parentElement;
+    while (node) {
+      runtime.frameHosts.add(node);
+      if (runtime.frameStates && !runtime.frameStates.has(node)) {
+        runtime.frameStates.set(node, { expanded: false });
+      }
+      if (node === main) break;
+      node = node.parentElement;
+    }
+  }
   function activeHeader() {
     var headers = document.querySelectorAll('[data-mj="header"]');
     var fallback = headers.length ? headers[headers.length - 1] : null;
@@ -115,6 +135,95 @@
       if (style.display !== "none" && style.visibility !== "hidden" && rect.width > 0) return headers[i];
     }
     return fallback;
+  }
+  function activePageMain() {
+    var mains = document.querySelectorAll('main[data-mj="page-content"]');
+    for (var i = mains.length - 1; i >= 0; i -= 1) {
+      var style = window.getComputedStyle(mains[i]);
+      var rect = mains[i].getBoundingClientRect();
+      if (mains[i].isConnected && style.display !== "none" && style.visibility !== "hidden" && rect.width > 0) {
+        return mains[i];
+      }
+    }
+    return mains.length ? mains[mains.length - 1] : null;
+  }
+  function safeReturnUrl(candidate) {
+    if (!candidate) return "";
+    try {
+      var url = new URL(candidate, window.location.origin);
+      var path = url.pathname.toLowerCase();
+      if (url.origin !== window.location.origin) return "";
+      if (/\/(?:game|play|launch)(?:\/|$)/.test(path)) return "";
+      return url.href;
+    } catch (error) {
+      return "";
+    }
+  }
+  function defaultGameReturnUrl() {
+    var live = runtime.route && runtime.route.liveCasino;
+    return new URL(live ? "/tr/livecasino/all" : "/tr/casino/all", window.location.origin).href;
+  }
+  function rememberSafePage(candidate) {
+    var safe = safeReturnUrl(candidate);
+    if (safe) runtime.lastSafeUrl = safe;
+    return safe;
+  }
+  function clearPendingGameReturn() {
+    runtime.pendingGameReturnUrl = "";
+    runtime.pendingGameReturnAt = 0;
+  }
+  function freshPendingGameReturn() {
+    if (!runtime.pendingGameReturnUrl || !runtime.pendingGameReturnAt ||
+        Date.now() - runtime.pendingGameReturnAt > 30000) {
+      clearPendingGameReturn();
+      return "";
+    }
+    return safeReturnUrl(runtime.pendingGameReturnUrl);
+  }
+  function isFrameTreeVisible(frame, main) {
+    var node = frame;
+    while (node && node.nodeType === 1) {
+      if (node.hidden || node.getAttribute("aria-hidden") === "true") return false;
+      var style = window.getComputedStyle(node);
+      if (style.display === "none" || style.visibility === "hidden" || style.visibility === "collapse") {
+        return false;
+      }
+      if (parseFloat(style.opacity) === 0 || style.contentVisibility === "hidden") {
+        return false;
+      }
+      var state = runtime.frameStates && runtime.frameStates.get(node);
+      var inlineCollapsed = node.style &&
+        (node.style.height === "0px" || node.style.maxHeight === "0px" || node.style.opacity === "0");
+      var rect = node.getBoundingClientRect();
+      var geometryCollapsed = rect.width === 0 || rect.height === 0;
+      if (inlineCollapsed || geometryCollapsed) {
+        if (state && state.expanded) return false;
+      } else if (state) {
+        state.expanded = true;
+      }
+      if (node === main) break;
+      node = node.parentElement;
+    }
+    return true;
+  }
+  function markActiveGameFrame(frame, main) {
+    if (runtime.activeGameFrame && runtime.activeGameFrame !== frame) {
+      runtime.activeGameFrame.removeAttribute("data-ng-active-game-frame");
+    }
+    runtime.activeGameHosts.forEach(function (host) {
+      if (host && host.removeAttribute) host.removeAttribute("data-ng-active-game-host");
+    });
+    runtime.activeGameHosts = [];
+    runtime.activeGameFrame = frame || null;
+    if (!frame) return;
+    frame.setAttribute("data-ng-active-game-frame", "true");
+    var node = frame.parentElement;
+    while (node) {
+      if (node === main) break;
+      node.setAttribute("data-ng-active-game-host", "true");
+      runtime.activeGameHosts.push(node);
+      node = node.parentElement;
+    }
   }
   function renderInfoStrip() {
     var header = activeHeader();
@@ -138,40 +247,91 @@
     document.documentElement.classList.add("ng-theme-info-mounted");
     return true;
   }
+  function gameSemanticHost(frame) {
+    return frame && frame.closest ? frame.closest(
+      '[data-mj="game-player"],[data-mj="game-frame"],[data-mj="game-launcher"],' +
+      '[data-mj="game-container"],[data-mj*="game-iframe"],[data-testid*="game-player"],' +
+      '[data-testid*="game-frame"],[class*="game-player"],[class*="game-frame"],' +
+      '[id*="game-player"],[id*="game-frame"]'
+    ) : null;
+  }
+  function isEligibleGameFrame(frame, main) {
+    if (!frame || frame.id === "phoenix365ifraim") return false;
+    if (frame.closest && frame.closest("#sportsbook-wrapper")) return false;
+    if (!isFrameTreeVisible(frame, main)) return false;
+    var source = (frame.getAttribute("src") || "").trim();
+    if (/(?:captcha|recaptcha|hcaptcha|turnstile|youtube|vimeo|verification|live-chat)/i.test(source)) return false;
+    return true;
+  }
+  function isContextualGameFrame(frame, main) {
+    if (!isEligibleGameFrame(frame, main)) return false;
+    var source = (frame.getAttribute("src") || "").trim();
+    var sourceDoc = (frame.getAttribute("srcdoc") || "").trim();
+    var semanticHost = gameSemanticHost(frame);
+    if (semanticHost) return true;
+    var routePath = runtime.route ? runtime.route.path : cleanPath();
+    var explicitGameContext = /^\/tr\/(?:game|play|launch)(?:\/|$)/.test(routePath) ||
+      /^\/tr\/(?:casino|live-casino|livecasino|canli-casino)\/[^/]+\/[^/]+(?:\/|$)/.test(routePath);
+    var pendingContext = !!freshPendingGameReturn();
+    if (!explicitGameContext && !pendingContext) return false;
+    if ((source && !/^about:blank(?:#|$)/i.test(source)) || sourceDoc) return true;
+    return explicitGameContext || pendingContext;
+  }
   function syncEmbeddedGameState() {
-    var main = query('main[data-mj="page-content"]');
+    var main = activePageMain();
     var frames = main ? main.querySelectorAll("iframe") : [];
-    var frame = null;
+    var frame = null, candidates = [];
     for (var i = 0; i < frames.length; i += 1) {
-      if (frames[i].id === "phoenix365ifraim") continue;
-      if (frames[i].closest && frames[i].closest("#sportsbook-wrapper")) continue;
-      var source = (frames[i].getAttribute("src") || "").trim();
-      if (!source || /^about:blank(?:#|$)/i.test(source)) continue;
-      if (/(?:captcha|recaptcha|hcaptcha|turnstile|youtube|vimeo|verification|live-chat)/i.test(source)) continue;
-      observeShellNode(frames[i]);
-      var style = window.getComputedStyle(frames[i]);
-      var rect = frames[i].getBoundingClientRect();
-      if (style.display === "none" || style.visibility === "hidden") continue;
-      if (rect.width < 160 || rect.height < 120) {
-        if (frames[i].getAttribute("data-ng-frame-probe") !== REVISION) {
-          frames[i].setAttribute("data-ng-frame-probe", REVISION);
-          window.setTimeout(function () {
-            if (window[GLOBAL_KEY] === runtime) queueCritical(["shell"]);
-          }, 120);
-        }
-        continue;
-      }
-      frame = frames[i];
-      break;
+      observeFrameLifecycle(frames[i], main);
+      if (!isEligibleGameFrame(frames[i], main)) continue;
+      candidates.push(frames[i]);
+      if (!frame && gameSemanticHost(frames[i])) frame = frames[i];
     }
-    var active = !!frame && !(runtime.route && runtime.route.sports);
+    if (!frame && candidates.length === 1 && isContextualGameFrame(candidates[0], main)) frame = candidates[0];
+    var active = !!frame;
+    if (active && !runtime.gameActive) {
+      var pendingReturn = freshPendingGameReturn();
+      var currentUrl = safeReturnUrl(window.location.href);
+      var previousUrl = safeReturnUrl(runtime.lastSafeUrl);
+      if (previousUrl === currentUrl) previousUrl = "";
+      runtime.gameReturnUrl = pendingReturn || previousUrl || defaultGameReturnUrl();
+      clearPendingGameReturn();
+    }
+    if (!active && runtime.gameActive) clearPendingGameReturn();
+    runtime.gameActive = active;
+    markActiveGameFrame(active ? frame : null, main);
     document.documentElement.classList.toggle("ng-game-embed", active);
     return active;
+  }
+  function renderGameReturn(active) {
+    var existing = document.getElementById("narcos-game-return");
+    if (!active) {
+      if (existing) existing.remove();
+      return false;
+    }
+    var shell = activeHeader();
+    var header = shell && query('[aria-label="site-header"]', shell);
+    if (!header) header = query('[aria-label="site-header"]');
+    if (!header) return false;
+    var right = query('[data-mj="header-right"]', header) || header;
+    var login = query('[data-mj="login-button"]', right);
+    var loginRoot = directChild(login, right);
+    mount("narcos-game-return", "button", right, loginRoot, function (button) {
+      button.className = "ng-game-return";
+      button.type = "button";
+      button.setAttribute("aria-label", "Siteye geri dön");
+      button.setAttribute("data-ng-action", "game-return");
+      var icon = create("span", "ng-game-return-icon", "←");
+      icon.setAttribute("aria-hidden", "true");
+      button.appendChild(icon);
+      button.appendChild(create("span", "ng-game-return-label", "Siteye Geri Dön"));
+    });
+    return true;
   }
   function renderShell() {
     pruneShellNodes();
     renderInfoStrip();
-    syncEmbeddedGameState();
+    renderGameReturn(syncEmbeddedGameState());
     return true;
   }
   function listen(target, type, handler, options) {
@@ -688,9 +848,13 @@
   function observeMutations(records) {
     var critical = Object.create(null), deferred = Object.create(null);
     records.forEach(function (record) {
-      if (record.type === "attributes" && record.target && record.target.matches && record.target.matches("iframe")) {
-        critical.shell = true;
-        return;
+      if (record.type === "attributes" && record.target && record.target.nodeType === 1) {
+        var frameAttribute = record.target.matches && record.target.matches("iframe");
+        var frameHostAttribute = runtime.frameHosts && runtime.frameHosts.has(record.target);
+        if (frameAttribute || frameHostAttribute) {
+          critical.shell = true;
+          return;
+        }
       }
       var shouldReconcile = false;
       Array.prototype.forEach.call(record.addedNodes, function (node) {
@@ -730,9 +894,28 @@
   }
   function onDocumentClick(event) {
     var target = event.target;
+    var gameCard = target && target.closest ? target.closest(
+      '[data-mj="game-catalog-card"],[data-mj="widget-game-card"],[data-mj="game-card"],' +
+      '[data-mj*="game-card"],[data-testid*="game-card"],[class*="game-card"]'
+    ) : null;
+    if (gameCard && !runtime.gameActive) {
+      runtime.pendingGameReturnUrl = safeReturnUrl(window.location.href) ||
+        safeReturnUrl(runtime.lastSafeUrl) || defaultGameReturnUrl();
+      runtime.pendingGameReturnAt = Date.now();
+    }
     var action = target && target.closest ? target.closest("[data-ng-action]") : null;
     if (action) {
       event.preventDefault();
+      if (action.getAttribute("data-ng-action") === "game-return") {
+        event.stopPropagation();
+        var returnUrl = safeReturnUrl(runtime.gameReturnUrl) ||
+          safeReturnUrl(runtime.lastSafeUrl) || defaultGameReturnUrl();
+        runtime.gameActive = false;
+        document.documentElement.classList.remove("ng-game-embed");
+        renderGameReturn(false);
+        window.location.assign(returnUrl);
+        return;
+      }
       var chat = findChatButton();
       if (chat) chat.click();
       else if (action.getAttribute("data-ng-action") === "chat-or-telegram") window.open(TELEGRAM_URL, "_blank", "noopener,noreferrer");
@@ -740,13 +923,17 @@
       return;
     }
     var link = target && target.closest ? target.closest("a[href]") : null;
-    if (link && link.origin === window.location.origin) window.setTimeout(handleRouteChange, 0);
+    if (link && link.origin === window.location.origin) {
+      if (!runtime.gameActive) rememberSafePage(window.location.href);
+      window.setTimeout(handleRouteChange, 0);
+    }
   }
   function patchHistory() {
     ["pushState", "replaceState"].forEach(function (name) {
       var original = window.history[name];
       if (typeof original !== "function") return;
       var wrapped = function () {
+        if (!runtime.gameActive) rememberSafePage(window.location.href);
         var result = original.apply(this, arguments);
         handleRouteChange(false);
         return result;
@@ -778,6 +965,7 @@
   }
   function refresh() {
     runtime.path = cleanPath(); runtime.route = classifyRoute(runtime.path);
+    if (!runtime.gameActive) rememberSafePage(window.location.href);
     applyRouteClasses();
     renderShell();
     renderHeader();
@@ -801,7 +989,10 @@
     if (runtime.effectsHandle && runtime.effectsKind === "idle" && window.cancelIdleCallback) window.cancelIdleCallback(runtime.effectsHandle);
     else if (runtime.effectsHandle) window.clearTimeout(runtime.effectsHandle);
     restoreCampaignHost();
+    markActiveGameFrame(null, null);
     document.documentElement.classList.remove("ng-game-embed", "ng-theme-info-mounted");
+    var gameReturn = document.getElementById("narcos-game-return");
+    if (gameReturn) gameReturn.remove();
     var infoStrip = document.getElementById("narcos-info-strip");
     if (infoStrip) infoStrip.remove();
     if (window[GLOBAL_KEY] === runtime) delete window[GLOBAL_KEY];
@@ -824,6 +1015,6 @@
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ["src"]
+    attributeFilter: ["src", "srcdoc", "hidden", "aria-hidden", "class", "style"]
   });
 })();
