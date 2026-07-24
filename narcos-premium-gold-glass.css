@@ -155,7 +155,12 @@ main [role="textbox"]:focus {
   text-decoration: underline !important;
   text-underline-offset: 2px;
 }
-.ng-info-separator { padding-inline: 8px; color: rgba(242, 213, 138, .65) !important; }
+.ng-info-separator {
+  flex: 0 0 auto;
+  margin-inline: 8px;
+  padding: 0;
+  color: rgba(242, 213, 138, .65) !important;
+}
 .ng-info-current { color: #fff4c7 !important; font-weight: 900 !important; }
 [data-mj="announcement"] button[aria-label="close"] {
   position: absolute !important; top: 50% !important; right: 10px !important; z-index: 3;
@@ -990,7 +995,7 @@ footer::before,
     letter-spacing: -.015em !important;
   }
   .ng-info-long { display: none !important; }
-  .ng-info-separator { padding-inline: 5px; }
+  .ng-info-separator { margin-inline: 5px; }
   [data-mj="header"] > :has([data-mj="announcement"]),
   [data-mj="header"] > [data-mj="announcement"] {
     position: relative !important;
@@ -1097,6 +1102,11 @@ footer::before,
     transform: none !important;
   }
   [data-mj="header-right"] [role="combobox"] { display: none !important; }
+  [data-mj="header-right"] > .ng-auth-profile-control {
+    order: 999 !important;
+    flex: 0 0 auto !important;
+    margin-left: 2px !important;
+  }
   [data-mj="login-button"] { min-width: 40px !important; padding-inline: 6px !important; }
   [data-mj="register-button"] { min-width: 46px !important; padding-inline: 6px !important; }
   .ng-call-button,

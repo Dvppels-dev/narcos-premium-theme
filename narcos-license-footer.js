@@ -2,7 +2,7 @@
    Keeps the current public DOM contract while avoiding destructive SPA patches. */
 (function () {
   "use strict";
-  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.3.0";
+  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.3.1";
   var previous = window[GLOBAL_KEY];
   if (previous && previous.version === VERSION && previous.refresh) {
     previous.refresh();
@@ -11,8 +11,9 @@
   if (previous && previous.destroy) previous.destroy();
   var VERIFY_URL = "https://verification.anjouangamblingboard.org/s/140e70a801efff238b59b01782ba34d909755fd6e27deb06c4959b328d6e9698e01f00b62578604eca16f199ebb446cb";
   var TELEGRAM_URL = "https://t.me/narcosresmi", CURRENT_URL = "https://narcosgir.com";
-  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v6";
+  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v7";
   var CASINO_LOBBY_PATH = "/tr/casino/all", LIVE_CASINO_LOBBY_PATH = "/tr/livecasino/all";
+  var CALL_REQUEST_PATH = "/tr/aranmatalep";
   function getBaseUrl() {
     var script = document.currentScript || document.querySelector('script[src*="narcos-license-footer"]');
     var source = script && script.src;
@@ -298,9 +299,9 @@
       strip.setAttribute("aria-label", "Güncel giriş adresi");
       var content = create("div", "ng-info-strip-content");
       content.appendChild(externalLink(CURRENT_URL, "ng-info-source", "narcosgir.com", "NarcosBahis güncel giriş sayfasını aç"));
-      content.appendChild(create("span", "ng-info-long", " adresinden her zaman güncel adresimize ulaşabilirsiniz."));
-      content.appendChild(create("span", "ng-info-separator", " • "));
-      content.appendChild(create("span", "ng-info-current-label", "Güncel giriş: "));
+      content.appendChild(create("span", "ng-info-long", "\u00a0adresinden her zaman güncel adresimize ulaşabilirsiniz."));
+      content.appendChild(create("span", "ng-info-separator", "\u00a0•\u00a0"));
+      content.appendChild(create("span", "ng-info-current-label", "Güncel giriş:\u00a0"));
       content.appendChild(create("strong", "ng-info-current", host));
       strip.appendChild(content);
     });
@@ -426,16 +427,24 @@
       '[data-mj*="profile" i]', '[data-mj*="account" i]',
       '[data-testid*="profile" i]', '[data-testid*="account" i]',
       '[aria-label*="profil" i]', '[aria-label*="hesab" i]', '[aria-label*="profile" i]',
-      '[aria-label*="account" i]'
+      '[aria-label*="account" i]', '[title*="profil" i]', '[title*="hesab" i]',
+      '[title*="profile" i]', '[title*="account" i]'
     ].join(",");
     var candidates = right.querySelectorAll(selector);
     for (var i = 0; i < candidates.length; i += 1) {
       var root = directChild(candidates[i], right);
       if (!isRejectedProfileRoot(root, right)) return root;
     }
-    if (query('[data-mj="login-button"],[data-mj="register-button"]', header)) return null;
+    var authControls = header.querySelectorAll('[data-mj="login-button"],[data-mj="register-button"]');
+    for (var authIndex = 0; authIndex < authControls.length; authIndex += 1) {
+      var authStyle = window.getComputedStyle(authControls[authIndex]);
+      var authRect = authControls[authIndex].getBoundingClientRect();
+      if (authStyle.display !== "none" && authStyle.visibility !== "hidden" && authRect.width > 0 && authRect.height > 0) {
+        return null;
+      }
+    }
     var children = right.children;
-    for (var j = 0; j < children.length; j += 1) {
+    for (var j = children.length - 1; j >= 0; j -= 1) {
       var child = children[j];
       if (isRejectedProfileRoot(child, right)) continue;
       var profileSignal = [
@@ -444,7 +453,14 @@
       ].join(" ").toLowerCase();
       var menu = child.matches('[aria-haspopup="menu"]') || query('[aria-haspopup="menu"]', child);
       var avatar = query('img[alt*="profil" i],img[alt*="profile" i],img[alt*="avatar" i],[class*="avatar" i]', child);
-      if (avatar || menu && /(?:profil|profile|account|hesab|user|avatar)/.test(profileSignal)) return child;
+      var buttonLike = child.matches('button,a,[role="button"]') || query('button,a,[role="button"]', child);
+      var compactText = (child.innerText || "").replace(/\s+/g, "").trim();
+      var visualIcon = query('svg,img,[style*="mask"],[style*="background-image"],[class*="icon" i]', child);
+      var childRect = child.getBoundingClientRect();
+      var compactSquare = childRect.width >= 24 && childRect.width <= 68 &&
+        childRect.height >= 24 && childRect.height <= 68 && Math.abs(childRect.width - childRect.height) <= 16;
+      var iconOnly = buttonLike && compactText.length === 0 && (visualIcon || compactSquare);
+      if (avatar || (menu && /(?:profil|profile|account|hesab|user|avatar)/.test(profileSignal)) || iconOnly) return child;
     }
     return null;
   }
@@ -489,11 +505,11 @@
     }
     var login = query('[data-mj="login-button"]', right);
     var loginRoot = directChild(login, right);
-    var call = mount("narcos-call-button", "button", right, loginRoot, function (button) {
+    var call = mount("narcos-call-button", "a", right, loginRoot, function (button) {
       button.className = "ng-call-button";
-      button.type = "button";
-      button.setAttribute("aria-label", "Beni ara - canlı desteği aç");
-      button.setAttribute("data-ng-action", "chat-or-telegram");
+      button.href = CALL_REQUEST_PATH;
+      button.setAttribute("aria-label", "Aranma talebi oluştur");
+      button.setAttribute("data-ng-action", "call-request");
       var icon = makeImage(ASSETS.telephone, "ng-call-icon", "", 24, 24, false);
       icon.setAttribute("aria-hidden", "true");
       button.appendChild(icon);
@@ -1035,9 +1051,13 @@
         window.location.assign(returnUrl);
         return;
       }
+      if (action.getAttribute("data-ng-action") === "call-request") {
+        event.stopPropagation();
+        window.location.assign(new URL(CALL_REQUEST_PATH, window.location.origin).href);
+        return;
+      }
       var chat = findChatButton();
       if (chat) chat.click();
-      else if (action.getAttribute("data-ng-action") === "chat-or-telegram") window.open(TELEGRAM_URL, "_blank", "noopener,noreferrer");
       else window.location.href = "mailto:" + SUPPORT_EMAIL;
       return;
     }
