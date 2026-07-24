@@ -2,7 +2,7 @@
    Keeps the current public DOM contract while avoiding destructive SPA patches. */
 (function () {
   "use strict";
-  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.2.1";
+  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.3.0";
   var previous = window[GLOBAL_KEY];
   if (previous && previous.version === VERSION && previous.refresh) {
     previous.refresh();
@@ -11,7 +11,8 @@
   if (previous && previous.destroy) previous.destroy();
   var VERIFY_URL = "https://verification.anjouangamblingboard.org/s/140e70a801efff238b59b01782ba34d909755fd6e27deb06c4959b328d6e9698e01f00b62578604eca16f199ebb446cb";
   var TELEGRAM_URL = "https://t.me/narcosresmi", CURRENT_URL = "https://narcosgir.com";
-  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v5";
+  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v6";
+  var CASINO_LOBBY_PATH = "/tr/casino/all", LIVE_CASINO_LOBBY_PATH = "/tr/livecasino/all";
   function getBaseUrl() {
     var script = document.currentScript || document.querySelector('script[src*="narcos-license-footer"]');
     var source = script && script.src;
@@ -37,7 +38,8 @@
     frameHosts: typeof WeakSet === "function" ? new WeakSet() : null,
     frameStates: typeof WeakMap === "function" ? new WeakMap() : null,
     listeners: [], history: [], path: "", route: null,
-    gameActive: false, gameReturnUrl: "", pendingGameReturnUrl: "", pendingGameReturnAt: 0,
+    gameActive: false, gameReturnUrl: "", gameLobbyPath: CASINO_LOBBY_PATH,
+    pendingGameReturnUrl: "", pendingGameReturnAt: 0,
     pendingGamePath: "", lastSafeUrl: "", gameMissingSince: 0, gameMissingTimer: 0,
     activeGameFrame: null, activeGameHosts: [],
     campaignMain: null, campaignTitle: "", generatedTitle: "",
@@ -164,8 +166,27 @@
       return "";
     }
   }
-  function defaultGameReturnUrl() {
-    return new URL("/tr/", window.location.origin).href;
+  function inferGameLobbyPath(sourceNode) {
+    var path = cleanPath();
+    if (/^\/tr\/(?:live-casino|livecasino|canli-casino)(?:\/|$)/.test(path)) {
+      return LIVE_CASINO_LOBBY_PATH;
+    }
+    var node = sourceNode, parts = [], depth = 0;
+    while (node && node.nodeType === 1 && depth < 7) {
+      if (node.tagName === "MAIN") break;
+      ["href", "data-mj", "data-testid", "id", "class", "aria-label"].forEach(function (name) {
+        var value = node.getAttribute && node.getAttribute(name);
+        if (value) parts.push(value);
+      });
+      if (depth === 0 && node.textContent) parts.push(node.textContent.slice(0, 180));
+      node = node.parentElement;
+      depth += 1;
+    }
+    return /(?:live[-_\s]?casino|canli[-_\s]?casino|canlı\s*casino)/i.test(parts.join(" ")) ?
+      LIVE_CASINO_LOBBY_PATH : CASINO_LOBBY_PATH;
+  }
+  function gameLobbyUrl() {
+    return new URL(runtime.gameLobbyPath || CASINO_LOBBY_PATH, window.location.origin).href;
   }
   function rememberSafePage(candidate) {
     var safe = safeReturnUrl(candidate);
@@ -181,8 +202,9 @@
       runtime.pendingGameTimer = 0;
     }
   }
-  function armGameReturn() {
-    runtime.gameReturnUrl = defaultGameReturnUrl();
+  function armGameReturn(sourceNode) {
+    runtime.gameLobbyPath = inferGameLobbyPath(sourceNode);
+    runtime.gameReturnUrl = gameLobbyUrl();
     runtime.pendingGameReturnUrl = runtime.gameReturnUrl;
     runtime.pendingGameReturnAt = Date.now();
     runtime.pendingGamePath = cleanPath();
@@ -330,7 +352,8 @@
       clearGameMissingWatch();
     }
     if (active && !runtime.gameActive) {
-      runtime.gameReturnUrl = defaultGameReturnUrl();
+      if (!freshPendingGameReturn()) runtime.gameLobbyPath = inferGameLobbyPath(frame);
+      runtime.gameReturnUrl = gameLobbyUrl();
       clearPendingGameReturn();
     }
     if (active) {
@@ -366,19 +389,16 @@
     var header = shell && query('[aria-label="site-header"]', shell);
     if (!header) header = query('[aria-label="site-header"]');
     if (!header) return false;
-    var right = query('[data-mj="header-right"]', header) || header;
-    var login = query('[data-mj="login-button"]', right);
-    var loginRoot = directChild(login, right);
-    mount("narcos-game-return", "a", right, loginRoot, function (button) {
+    var button = mount("narcos-game-return", "a", header, null, function (button) {
       button.className = "ng-game-return";
-      button.href = defaultGameReturnUrl();
-      button.setAttribute("aria-label", "Ana sayfaya geri dön");
+      button.setAttribute("aria-label", "Oyun lobisine geri dön");
       button.setAttribute("data-ng-action", "game-return");
       var icon = create("span", "ng-game-return-icon", "←");
       icon.setAttribute("aria-hidden", "true");
       button.appendChild(icon);
-      button.appendChild(create("span", "ng-game-return-label", "Ana Sayfaya Dön"));
+      button.appendChild(create("span", "ng-game-return-label", "Lobiye Dön"));
     });
+    button.href = gameLobbyUrl();
     return true;
   }
   function renderShell() {
@@ -391,11 +411,55 @@
     target.addEventListener(type, handler, options); runtime.listeners.push([target, type, handler, options]);
   }
   function findChatButton() { return query('button[aria-label="Sohbeti aç"],button[aria-label*="Sohbet"],button[aria-label*="sohbet"]'); }
+  function isRejectedProfileRoot(root, right) {
+    if (!root || root.parentElement !== right || root.id && root.id.indexOf("narcos-") === 0) return true;
+    if (root.matches('[data-mj="login-button"],[data-mj="register-button"],[data-mj="header-special-button"],[role="combobox"]')) return true;
+    if (query('[data-mj="login-button"],[data-mj="register-button"],[data-mj="header-special-button"],[role="combobox"]', root)) return true;
+    var signal = [
+      root.getAttribute("data-mj"), root.getAttribute("data-testid"), root.getAttribute("aria-label"),
+      root.getAttribute("title"), root.id, root.className, root.textContent
+    ].join(" ").toLowerCase();
+    return /(?:türkçe|turkce|language|locale|flag|giriş|giris|kayıt|kayit|login|register|balance|wallet|deposit|withdraw|cashier|bakiye|cüzdan|yatır|çekim)/.test(signal);
+  }
+  function findAuthenticatedProfileRoot(header, right) {
+    var selector = [
+      '[data-mj*="profile" i]', '[data-mj*="account" i]',
+      '[data-testid*="profile" i]', '[data-testid*="account" i]',
+      '[aria-label*="profil" i]', '[aria-label*="hesab" i]', '[aria-label*="profile" i]',
+      '[aria-label*="account" i]'
+    ].join(",");
+    var candidates = right.querySelectorAll(selector);
+    for (var i = 0; i < candidates.length; i += 1) {
+      var root = directChild(candidates[i], right);
+      if (!isRejectedProfileRoot(root, right)) return root;
+    }
+    if (query('[data-mj="login-button"],[data-mj="register-button"]', header)) return null;
+    var children = right.children;
+    for (var j = 0; j < children.length; j += 1) {
+      var child = children[j];
+      if (isRejectedProfileRoot(child, right)) continue;
+      var profileSignal = [
+        child.getAttribute("data-mj"), child.getAttribute("data-testid"), child.getAttribute("aria-label"),
+        child.getAttribute("title"), child.id, child.className
+      ].join(" ").toLowerCase();
+      var menu = child.matches('[aria-haspopup="menu"]') || query('[aria-haspopup="menu"]', child);
+      var avatar = query('img[alt*="profil" i],img[alt*="profile" i],img[alt*="avatar" i],[class*="avatar" i]', child);
+      if (avatar || menu && /(?:profil|profile|account|hesab|user|avatar)/.test(profileSignal)) return child;
+    }
+    return null;
+  }
   function renderHeader() {
-    var header = query('[aria-label="site-header"]');
+    var shell = activeHeader();
+    var header = shell && query('[aria-label="site-header"]', shell);
+    if (!header) header = query('[aria-label="site-header"]');
     if (!header) return false;
     var left = query('[data-mj="header-left"]', header);
     var right = query('[data-mj="header-right"]', header) || header;
+    Array.prototype.forEach.call(document.querySelectorAll(".ng-auth-profile-control"), function (node) {
+      node.classList.remove("ng-auth-profile-control");
+    });
+    var profileRoot = findAuthenticatedProfileRoot(header, right);
+    if (profileRoot) profileRoot.classList.add("ng-auth-profile-control");
     if (left) {
       var logo = query('[data-mj="logo"]', left);
       if (logo) {
@@ -958,14 +1022,14 @@
       '[data-mj*="game-card"],[data-testid*="game-card"],[class*="game-card"]'
     ) : null;
     if (gameCard && !runtime.gameActive) {
-      armGameReturn();
+      armGameReturn(gameCard);
     }
     var action = target && target.closest ? target.closest("[data-ng-action]") : null;
     if (action) {
       event.preventDefault();
       if (action.getAttribute("data-ng-action") === "game-return") {
         event.stopPropagation();
-        var returnUrl = defaultGameReturnUrl();
+        var returnUrl = gameLobbyUrl();
         endGameSession();
         renderGameReturn(false);
         window.location.assign(returnUrl);
@@ -1050,6 +1114,9 @@
     document.documentElement.classList.remove("ng-game-embed", "ng-game-return-ready", "ng-theme-info-mounted");
     var gameReturn = document.getElementById("narcos-game-return");
     if (gameReturn) gameReturn.remove();
+    Array.prototype.forEach.call(document.querySelectorAll(".ng-auth-profile-control"), function (node) {
+      node.classList.remove("ng-auth-profile-control");
+    });
     var infoStrip = document.getElementById("narcos-info-strip");
     if (infoStrip) infoStrip.remove();
     if (window[GLOBAL_KEY] === runtime) delete window[GLOBAL_KEY];
