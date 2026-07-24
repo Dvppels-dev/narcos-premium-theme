@@ -52,10 +52,7 @@ main button,
 main [role="button"],
 main a {
   -webkit-tap-highlight-color: transparent;
-  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease !important;
 }
-main button:hover,
-main [role="button"]:hover { filter: brightness(1.08); transform: translateY(-1px); }
 main input,
 main select,
 main textarea,
@@ -332,11 +329,12 @@ html.ng-effects-ready [data-mj="header-left"] [data-mj="logo"] img { animation: 
   background: transparent !important;
   box-shadow: none !important;
 }
-[data-mj="widget-pages-item"]:hover,
-[data-mj="widget-game-card"]:hover {
-  position: relative;
-  z-index: 2;
-  transform: translateY(-4px) scale(1.025) !important;
+[data-mj="widget-pages-item"],
+[data-mj="widget-game-card"],
+[data-mj="game-catalog-card"],
+[data-mj="game-catalog-category-list-item"],
+[data-mj="promotions-tabs"] button {
+  transition: transform .18s ease, border-color .18s ease, opacity .18s ease !important;
 }
 @property --ng-neon-angle {
   syntax: "<angle>";
@@ -390,8 +388,7 @@ html.ng-effects-ready [data-mj="widget-multi-banner-slider"]::before {
   color: rgba(255, 255, 255, .82) !important;
   border-radius: 10px !important;
 }
-[data-mj="game-catalog-category-list-item"].active,
-[data-mj="game-catalog-category-list-item"]:hover {
+[data-mj="game-catalog-category-list-item"].active {
   color: #17130b !important;
   background: linear-gradient(120deg, #c68c28, #ffe99d 58%, #b77b1e) !important;
 }
@@ -404,7 +401,9 @@ html.ng-effects-ready [data-mj="widget-multi-banner-slider"]::before {
   border: 1px solid rgba(242, 213, 138, .18) !important;
   border-radius: 15px !important;
   background: var(--ng-dark-fill) !important;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, .25) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .045), 0 4px 12px rgba(0, 0, 0, .16) !important;
+  contain: layout paint style;
+  content-visibility: auto;
 }
 [data-mj="game-catalog-card"] > img {
   position: absolute !important; inset: 0 !important; z-index: 1;
@@ -412,10 +411,29 @@ html.ng-effects-ready [data-mj="widget-multi-banner-slider"]::before {
   object-fit: cover !important;
   border-radius: inherit !important;
 }
-[data-mj="game-catalog-card"]:hover {
-  border-color: rgba(242, 213, 138, .72) !important;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, .38), 0 0 20px rgba(201, 152, 67, .22) !important;
-  transform: translateY(-4px) !important;
+@media (hover: hover) and (pointer: fine) {
+  main :where(button, [role="button"], .ng-campaign-button) {
+    transition: transform .16s ease, opacity .16s ease !important;
+  }
+  main :where(button, [role="button"], .ng-campaign-button):hover {
+    opacity: .94;
+    transform: translateY(-1px);
+  }
+  [data-mj="widget-pages-item"]:hover,
+  [data-mj="widget-game-card"]:hover {
+    position: relative;
+    z-index: 2;
+    transform: translateY(-4px) scale(1.025) !important;
+  }
+  [data-mj="game-catalog-category-list-item"]:hover {
+    color: #17130b !important;
+    background: linear-gradient(120deg, #c68c28, #ffe99d 58%, #b77b1e) !important;
+  }
+  [data-mj="game-catalog-card"]:hover {
+    border-color: rgba(242, 213, 138, .72) !important;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, .3), 0 0 14px rgba(201, 152, 67, .17) !important;
+    transform: translateY(-4px) !important;
+  }
 }
 [data-mj="promotions-page"] { padding: 18px clamp(12px, 2vw, 28px) 30px !important; }
 [data-mj="promotions-grid"] { gap: 18px !important; }
@@ -427,9 +445,15 @@ html.ng-effects-ready [data-mj="widget-multi-banner-slider"]::before {
   background: rgba(255, 255, 255, .045) !important;
   font-weight: 800 !important;
 }
-[data-mj="promotions-tabs"] button:is(.active, :hover, :focus-visible) {
+[data-mj="promotions-tabs"] button:is(.active, :focus-visible) {
   color: #17130b !important;
   background: linear-gradient(120deg, #c68c28, #ffe99d 58%, #b77b1e) !important;
+}
+@media (hover: hover) and (pointer: fine) {
+  [data-mj="promotions-tabs"] button:hover {
+    color: #17130b !important;
+    background: linear-gradient(120deg, #c68c28, #ffe99d 58%, #b77b1e) !important;
+  }
 }
 [data-mj="promotions-grid"] > a {
   display: block !important; overflow: hidden !important;
@@ -1148,29 +1172,11 @@ footer::before,
   html.ng-game-embed .ng-game-return-icon { font-size: 15px; }
   .ng-header-license { flex: 0 0 30px; width: 30px; height: 32px; }
   .ng-header-license-image { width: 30px; height: 30px; }
-  main[data-mj="page-content"]:not(:has(iframe)) { flex: 0 0 auto !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
-  html.ng-game-embed main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
-    position: relative !important;
+  html:not(.ng-game-embed):not(.ng-sports-route) main[data-mj="page-content"] {
     flex: 0 0 auto !important;
-    width: 100% !important;
-    height: max(420px, calc(100vh - 104px - env(safe-area-inset-bottom, 0px))) !important;
-    height: max(420px, calc(100dvh - 104px - env(safe-area-inset-bottom, 0px))) !important;
+    height: auto !important;
     min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-  }
-  html.ng-game-embed [data-mj="header"]:has([data-mj="custom-header"]) ~ main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
-    height: max(420px, calc(100vh - 164px - env(safe-area-inset-bottom, 0px))) !important;
-    height: max(420px, calc(100dvh - 164px - env(safe-area-inset-bottom, 0px))) !important;
-  }
-  html.ng-game-embed iframe[data-ng-active-game-frame="true"] {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    border: 0 !important;
+    overflow: visible !important;
   }
   [data-mj="widget-multi-banner"] { width: 100% !important; padding-inline: 12px !important; box-sizing: border-box !important; }
   [data-mj="widget-multi-banner-slider"] {
@@ -1187,7 +1193,7 @@ footer::before,
   [data-mj="game-catalog-module"] { width: 100% !important; padding: 10px 7px 24px !important; box-sizing: border-box !important; }
   [data-mj="game-catalog-list"] { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 7px 5px !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
   [data-mj="game-catalog-list"] > * { width: 100% !important; min-width: 0 !important; margin: 0 !important; }
-  [data-mj="game-catalog-card"] { width: 100% !important; min-width: 0 !important; border-radius: 8px !important; contain: layout paint style; }
+  [data-mj="game-catalog-card"] { width: 100% !important; min-width: 0 !important; border-radius: 8px !important; }
   [data-mj="game-catalog-provider-bottom-sheet-content"] {
     width: 100% !important;
     overflow: hidden !important;
@@ -1297,14 +1303,17 @@ footer::before,
   html.ng-game-embed #root {
     display: flex !important;
     flex-direction: column !important;
+    height: 100vh !important;
     height: 100svh !important;
-    height: 100dvh !important;
     min-height: 0 !important;
     overflow: hidden !important;
   }
   html.ng-game-embed [data-mj="header"] { flex: 0 0 auto !important; }
-  html.ng-game-embed main[data-mj="page-content"]:has(iframe):not(:has(#sportsbook-wrapper)) {
+  html.ng-game-embed main[data-mj="page-content"] {
+    position: relative !important;
+    display: flex !important;
     flex: 1 1 0 !important;
+    flex-direction: column !important;
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
@@ -1314,11 +1323,21 @@ footer::before,
   }
   :where(html.ng-game-embed [data-ng-active-game-host="true"]) {
     position: relative !important;
+    flex: 1 1 0 !important;
     width: 100% !important;
-    height: 100%;
+    height: 100% !important;
     min-height: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
+  }
+  html.ng-game-embed iframe[data-ng-active-game-frame="true"] {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    border: 0 !important;
   }
   html.ng-game-embed [data-mj="bottom-nav"] {
     display: none !important;
@@ -1376,6 +1395,31 @@ footer::before,
 html.ng-theme-info-mounted [data-mj="header"]:has(#narcos-info-strip) [data-mj="announcement"],
 html.ng-theme-info-mounted [data-mj="header"]:has(#narcos-info-strip) > :has([data-mj="announcement"]):not(:has([data-mj="custom-header"])) {
   display: none !important;
+}
+/* Embedded games keep only the functional shell; decorative layers stay dormant. */
+html.ng-game-embed body::before,
+html.ng-game-embed body::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+html.ng-game-embed [aria-label="site-header"],
+html.ng-game-embed [data-mj="custom-header"],
+html.ng-game-embed [data-mj="header-nav"],
+html.ng-game-embed [data-mj="announcement"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html.ng-game-embed [data-mj="announcement"] p,
+html.ng-game-embed [data-mj="announcement"] p *,
+html.ng-game-embed [data-mj="header-left"] [data-mj="logo"] img,
+html.ng-game-embed [data-mj="widget-multi-banner-slider"]::before {
+  animation: none !important;
+  filter: none !important;
+}
+html.ng-game-embed [data-mj="widget-multi-banner-slider"]::before,
+html.ng-game-embed [data-mj="widget-multi-banner-slider"]::after {
+  box-shadow: none !important;
 }
 /* ---------------- SMALL MOBILE ---------------- */
 @media (max-width: 360px) {

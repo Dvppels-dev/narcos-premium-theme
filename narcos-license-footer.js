@@ -2,7 +2,7 @@
    Keeps the current public DOM contract while avoiding destructive SPA patches. */
 (function () {
   "use strict";
-  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.3.1";
+  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.4.0";
   var previous = window[GLOBAL_KEY];
   if (previous && previous.version === VERSION && previous.refresh) {
     previous.refresh();
@@ -11,7 +11,7 @@
   if (previous && previous.destroy) previous.destroy();
   var VERIFY_URL = "https://verification.anjouangamblingboard.org/s/140e70a801efff238b59b01782ba34d909755fd6e27deb06c4959b328d6e9698e01f00b62578604eca16f199ebb446cb";
   var TELEGRAM_URL = "https://t.me/narcosresmi", CURRENT_URL = "https://narcosgir.com";
-  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v7";
+  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v8";
   var CASINO_LOBBY_PATH = "/tr/casino/all", LIVE_CASINO_LOBBY_PATH = "/tr/livecasino/all";
   var CALL_REQUEST_PATH = "/tr/aranmatalep";
   function getBaseUrl() {
@@ -35,8 +35,10 @@
   };
   var runtime = {
     version: VERSION,
-    observer: null, resizeObserver: null, observedShellNodes: [],
-    frameHosts: typeof WeakSet === "function" ? new WeakSet() : null,
+    observer: null, frameObserver: null, headerObserver: null, textObserver: null,
+    resizeObserver: null,
+    observedShellNodes: [], observedFrameNodes: [], observedGameResizeNodes: [],
+    observedHeaderNode: null, observedTextRoots: [],
     frameStates: typeof WeakMap === "function" ? new WeakMap() : null,
     listeners: [], history: [], path: "", route: null,
     gameActive: false, gameReturnUrl: "", gameLobbyPath: CASINO_LOBBY_PATH,
@@ -57,10 +59,11 @@
   }
   function makeImage(src, className, alt, width, height, lazy) {
     var image = create("img", className);
-    image.src = src; image.alt = alt || ""; image.width = width; image.height = height;
+    image.alt = alt || ""; image.width = width; image.height = height;
     image.decoding = "async";
     if (lazy) image.loading = "lazy";
     if (lazy) image.setAttribute("fetchpriority", "low");
+    image.src = src;
     return image;
   }
   function externalLink(href, className, textValue, ariaLabel) {
@@ -118,21 +121,110 @@
       runtime.observedShellNodes.splice(i, 1);
     }
   }
-  function observeFrameLifecycle(frame, main) {
-    observeShellNode(frame);
-    if (runtime.frameStates && !runtime.frameStates.has(frame)) {
-      runtime.frameStates.set(frame, { expanded: false });
+  var FRAME_ATTRIBUTE_OPTIONS = {
+    attributes: true,
+    attributeFilter: ["src", "srcdoc", "hidden", "aria-hidden", "class", "style"]
+  };
+  function pruneFrameNodes() {
+    if (!runtime.frameObserver) return;
+    var connected = runtime.observedFrameNodes.filter(function (node) {
+      return node && node.nodeType === 1 && node.ownerDocument === document && node.isConnected;
+    });
+    if (connected.length === runtime.observedFrameNodes.length) return;
+    runtime.frameObserver.disconnect();
+    runtime.observedFrameNodes = connected;
+    connected.forEach(function (node) {
+      runtime.frameObserver.observe(node, FRAME_ATTRIBUTE_OPTIONS);
+    });
+  }
+  function pushUniqueNode(nodes, node) {
+    if (node && node.nodeType === 1 && node.ownerDocument === document &&
+        nodes.indexOf(node) === -1) {
+      nodes.push(node);
     }
-    if (!runtime.frameHosts) return;
-    var node = frame && frame.parentElement;
-    while (node) {
-      runtime.frameHosts.add(node);
-      if (runtime.frameStates && !runtime.frameStates.has(node)) {
-        runtime.frameStates.set(node, { expanded: false });
+  }
+  function syncFrameObservers(frames, main) {
+    var attributeNodes = [];
+    Array.prototype.forEach.call(frames, function (frame) {
+      pushUniqueNode(attributeNodes, frame);
+      var node = frame.parentElement;
+      while (node) {
+        pushUniqueNode(attributeNodes, node);
+        if (runtime.frameStates && !runtime.frameStates.has(node)) {
+          runtime.frameStates.set(node, { expanded: false });
+        }
+        if (node === main) break;
+        node = node.parentElement;
       }
-      if (node === main) break;
-      node = node.parentElement;
+    });
+    var sameAttributeNodes = attributeNodes.length === runtime.observedFrameNodes.length;
+    if (sameAttributeNodes) {
+      for (var index = 0; index < attributeNodes.length; index += 1) {
+        if (attributeNodes[index] !== runtime.observedFrameNodes[index]) {
+          sameAttributeNodes = false;
+          break;
+        }
+      }
     }
+    if (!sameAttributeNodes && runtime.frameObserver) {
+      runtime.frameObserver.disconnect();
+      runtime.observedFrameNodes = attributeNodes;
+      attributeNodes.forEach(function (node) {
+        runtime.frameObserver.observe(node, FRAME_ATTRIBUTE_OPTIONS);
+      });
+    }
+    var resizeNodes = Array.prototype.filter.call(frames, function (frame, index) {
+      return frame && frame.ownerDocument === document &&
+        Array.prototype.indexOf.call(frames, frame) === index;
+    });
+    if (runtime.resizeObserver) {
+      runtime.observedGameResizeNodes.forEach(function (node) {
+        if (resizeNodes.indexOf(node) === -1) runtime.resizeObserver.unobserve(node);
+      });
+      resizeNodes.forEach(function (node) {
+        if (runtime.observedGameResizeNodes.indexOf(node) === -1) {
+          runtime.resizeObserver.observe(node);
+        }
+      });
+    }
+    runtime.observedGameResizeNodes = resizeNodes;
+  }
+  function observeHeaderState(node) {
+    if (!node || node.nodeType !== 1 || node.ownerDocument !== document ||
+        !runtime.headerObserver || runtime.observedHeaderNode === node) return;
+    runtime.headerObserver.disconnect();
+    runtime.observedHeaderNode = node;
+    runtime.headerObserver.observe(node, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ["hidden", "aria-hidden", "class", "style"]
+    });
+  }
+  var TEXT_OBSERVER_OPTIONS = { characterData: true, subtree: true };
+  function pruneTextRoots() {
+    if (!runtime.textObserver) return;
+    var route = runtime.route || classifyRoute(cleanPath());
+    var roots = runtime.observedTextRoots.filter(function (node) {
+      if (!node || node.nodeType !== 1 || node.ownerDocument !== document || !node.isConnected) {
+        return false;
+      }
+      if (node.matches('[data-mj="widget-collection-slider"]')) {
+        return route.home && node.getAttribute("data-ng-league-inspected") !== "1";
+      }
+      return true;
+    });
+    if (roots.length === runtime.observedTextRoots.length) return;
+    runtime.textObserver.disconnect();
+    runtime.observedTextRoots = roots;
+    roots.forEach(function (node) {
+      runtime.textObserver.observe(node, TEXT_OBSERVER_OPTIONS);
+    });
+  }
+  function observeTextRoot(node) {
+    if (!node || node.nodeType !== 1 || node.ownerDocument !== document ||
+        !runtime.textObserver || runtime.observedTextRoots.indexOf(node) !== -1) return;
+    runtime.observedTextRoots.push(node);
+    runtime.textObserver.observe(node, TEXT_OBSERVER_OPTIONS);
   }
   function activeHeader() {
     var headers = document.querySelectorAll('[data-mj="header"]');
@@ -268,6 +360,36 @@
     return true;
   }
   function markActiveGameFrame(frame, main) {
+    var nextHosts = [];
+    var nextNode = frame && frame.parentElement;
+    while (nextNode) {
+      if (nextNode === main) break;
+      nextHosts.push(nextNode);
+      nextNode = nextNode.parentElement;
+    }
+    var unchanged = runtime.activeGameFrame === (frame || null) &&
+      runtime.activeGameHosts.length === nextHosts.length;
+    if (unchanged) {
+      for (var index = 0; index < nextHosts.length; index += 1) {
+        if (runtime.activeGameHosts[index] !== nextHosts[index]) {
+          unchanged = false;
+          break;
+        }
+      }
+    }
+    if (unchanged && frame &&
+        frame.getAttribute("data-ng-active-game-frame") !== "true") {
+      unchanged = false;
+    }
+    if (unchanged) {
+      for (var markerIndex = 0; markerIndex < nextHosts.length; markerIndex += 1) {
+        if (nextHosts[markerIndex].getAttribute("data-ng-active-game-host") !== "true") {
+          unchanged = false;
+          break;
+        }
+      }
+    }
+    if (unchanged) return;
     if (runtime.activeGameFrame && runtime.activeGameFrame !== frame) {
       runtime.activeGameFrame.removeAttribute("data-ng-active-game-frame");
     }
@@ -278,16 +400,13 @@
     runtime.activeGameFrame = frame || null;
     if (!frame) return;
     frame.setAttribute("data-ng-active-game-frame", "true");
-    var node = frame.parentElement;
-    while (node) {
-      if (node === main) break;
-      node.setAttribute("data-ng-active-game-host", "true");
-      runtime.activeGameHosts.push(node);
-      node = node.parentElement;
-    }
+    nextHosts.forEach(function (host) {
+      host.setAttribute("data-ng-active-game-host", "true");
+      runtime.activeGameHosts.push(host);
+    });
   }
-  function renderInfoStrip() {
-    var header = activeHeader();
+  function renderInfoStrip(header) {
+    header = header || activeHeader();
     if (!header) {
       document.documentElement.classList.remove("ng-theme-info-mounted");
       return false;
@@ -316,20 +435,19 @@
       '[id*="game-player"],[id*="game-frame"]'
     ) : null;
   }
-  function isEligibleGameFrame(frame, main) {
+  function isPotentialGameFrame(frame) {
     if (!frame || frame.id === "phoenix365ifraim") return false;
     if (frame.closest && frame.closest("#sportsbook-wrapper")) return false;
-    if (!isFrameTreeVisible(frame, main)) return false;
     var source = (frame.getAttribute("src") || "").trim();
     if (/(?:captcha|recaptcha|hcaptcha|turnstile|youtube|vimeo|verification|live-chat)/i.test(source)) return false;
     return true;
   }
-  function isContextualGameFrame(frame, main) {
-    if (!isEligibleGameFrame(frame, main)) return false;
+  function isEligibleGameFrame(frame, main) {
+    return isFrameTreeVisible(frame, main);
+  }
+  function isContextualGameFrame(frame) {
     var source = (frame.getAttribute("src") || "").trim();
     var sourceDoc = (frame.getAttribute("srcdoc") || "").trim();
-    var semanticHost = gameSemanticHost(frame);
-    if (semanticHost) return true;
     var routePath = runtime.route ? runtime.route.path : cleanPath();
     var explicitGameContext = isGameRoutePath(routePath);
     var pendingContext = !!freshPendingGameReturn();
@@ -337,17 +455,31 @@
     if ((source && !/^about:blank(?:#|$)/i.test(source)) || sourceDoc) return true;
     return explicitGameContext || pendingContext;
   }
-  function syncEmbeddedGameState() {
-    var main = activePageMain();
+  function syncEmbeddedGameState(main) {
+    main = main || activePageMain();
     var frames = main ? main.querySelectorAll("iframe") : [];
-    var frame = null, candidates = [];
+    var frame = null, loneCandidate = null, candidateCount = 0;
+    var observedCandidates = [];
+    var routePath = runtime.route ? runtime.route.path : cleanPath();
+    var contextualGameRoute = isGameRoutePath(routePath) || !!freshPendingGameReturn();
     for (var i = 0; i < frames.length; i += 1) {
-      observeFrameLifecycle(frames[i], main);
+      if (!isPotentialGameFrame(frames[i])) continue;
+      var semanticHost = gameSemanticHost(frames[i]);
+      if (!semanticHost && !contextualGameRoute) continue;
+      observedCandidates.push(frames[i]);
+      if (runtime.frameStates && !runtime.frameStates.has(frames[i])) {
+        runtime.frameStates.set(frames[i], { expanded: false });
+      }
       if (!isEligibleGameFrame(frames[i], main)) continue;
-      candidates.push(frames[i]);
-      if (!frame && gameSemanticHost(frames[i])) frame = frames[i];
+      candidateCount += 1;
+      if (candidateCount === 1) loneCandidate = frames[i];
+      if (semanticHost) {
+        frame = frames[i];
+        break;
+      }
     }
-    if (!frame && candidates.length === 1 && isContextualGameFrame(candidates[0], main)) frame = candidates[0];
+    if (!frame && candidateCount === 1 && isContextualGameFrame(loneCandidate)) frame = loneCandidate;
+    syncFrameObservers(observedCandidates, main);
     var active = !!frame;
     if (active) {
       clearGameMissingWatch();
@@ -368,7 +500,7 @@
         runtime.gameMissingSince = Date.now();
         runtime.gameMissingTimer = window.setTimeout(function () {
           runtime.gameMissingTimer = 0;
-          if (window[GLOBAL_KEY] === runtime) renderShell();
+          if (window[GLOBAL_KEY] === runtime) queueCritical(["shell"]);
         }, 480);
       }
       if (Date.now() - runtime.gameMissingSince < 420) return true;
@@ -379,14 +511,14 @@
     document.documentElement.classList.remove("ng-game-embed");
     return !!freshPendingGameReturn();
   }
-  function renderGameReturn(active) {
+  function renderGameReturn(active, shell) {
     document.documentElement.classList.toggle("ng-game-return-ready", !!active);
     var existing = document.getElementById("narcos-game-return");
     if (!active) {
       if (existing) existing.remove();
       return false;
     }
-    var shell = activeHeader();
+    shell = shell || activeHeader();
     var header = shell && query('[aria-label="site-header"]', shell);
     if (!header) header = query('[aria-label="site-header"]');
     if (!header) return false;
@@ -404,8 +536,12 @@
   }
   function renderShell() {
     pruneShellNodes();
-    renderInfoStrip();
-    renderGameReturn(syncEmbeddedGameState());
+    pruneFrameNodes();
+    pruneTextRoots();
+    var header = activeHeader();
+    var main = activePageMain();
+    renderInfoStrip(header);
+    renderGameReturn(syncEmbeddedGameState(main), header);
     return true;
   }
   function listen(target, type, handler, options) {
@@ -495,7 +631,7 @@
       gift.classList.add("ng-gift-button");
       gift.setAttribute("aria-label", "Hediye ve bonuslar");
       Array.prototype.forEach.call(gift.childNodes, function (node) {
-        if (node.nodeType === 3) node.textContent = "";
+        if (node.nodeType === 3 && node.textContent) node.textContent = "";
       });
       if (!query(".ng-gift-icon", gift)) {
         var giftIcon = create("span", "ng-gift-icon");
@@ -529,7 +665,10 @@
     if (giftRoot && giftRoot !== loginRoot && giftRoot !== call && giftRoot !== telegram) {
       place(right, giftRoot, telegram);
     }
-    renderGameReturn(runtime.gameActive || !!freshPendingGameReturn());
+    observeHeaderState(header);
+    observeTextRoot(header);
+    if (runtime.headerObserver) runtime.headerObserver.takeRecords();
+    renderGameReturn(runtime.gameActive || !!freshPendingGameReturn(), shell);
     return true;
   }
   function socialCard(options) {
@@ -688,6 +827,7 @@
     var footer = query("footer");
     var target = query('[data-mj="footer-content"]') || footer;
     if (!footer || !target) return false;
+    observeTextRoot(footer);
     var contact = mount("narcos-contact-button", "a", target, null, renderContact);
     var license = mount("narcos-license-banner", "section", target, contact, renderLicense);
     var social = mount("narcos-social-panel", "section", target, license, renderSocial);
@@ -901,16 +1041,32 @@
     return true;
   }
   function markLeagueWidget() {
-    var widgets = document.querySelectorAll('[data-mj="widget-collection-slider"]:not(.ng-leagues-widget)');
+    var route = runtime.route || classifyRoute(cleanPath());
+    if (!route.home) return false;
+    var widgets = document.querySelectorAll(
+      '[data-mj="widget-collection-slider"]:not([data-ng-league-inspected])'
+    );
     Array.prototype.forEach.call(widgets, function (widget) {
+      observeTextRoot(widget);
       var headings = widget.querySelectorAll("p");
+      if (!headings.length) return;
+      var hasHydratedHeading = false;
+      for (var headingIndex = 0; headingIndex < headings.length; headingIndex += 1) {
+        if (headings[headingIndex].textContent.trim()) {
+          hasHydratedHeading = true;
+          break;
+        }
+      }
+      if (!hasHydratedHeading) return;
       for (var i = 0; i < headings.length; i += 1) {
         if (headings[i].textContent.trim().toLowerCase() === "ligler") {
+          widget.setAttribute("data-ng-league-inspected", "1");
           widget.classList.add("ng-leagues-widget");
           break;
         }
       }
     });
+    pruneTextRoots();
     return true;
   }
   function applyRouteClasses() {
@@ -929,7 +1085,17 @@
       if (JOBS[name]) JOBS[name]();
     });
   }
+  function routeDeferredJobs(includeShellExtras) {
+    var route = runtime.route || classifyRoute(cleanPath());
+    var names = [];
+    if (route.home || document.getElementById("narcos-game-hub")) names.push("trust");
+    if (route.casino || document.getElementById("narcos-egt-jackpot")) names.push("jackpot");
+    if (route.home) names.push("leagues");
+    if (includeShellExtras) names.push("sidebar", "footer");
+    return names;
+  }
   function queueCritical(names) {
+    if (!names.length) return;
     names.forEach(function (name) { runtime.criticalDirty[name] = true; });
     if (runtime.criticalFrame) return;
     var run = function () {
@@ -939,6 +1105,7 @@
     runtime.criticalFrame = window.requestAnimationFrame ? window.requestAnimationFrame(run) : window.setTimeout(run, 24);
   }
   function queueDeferred(names, timeout) {
+    if (!names.length) return;
     names.forEach(function (name) { runtime.deferredDirty[name] = true; });
     if (runtime.deferredHandle) return;
     var run = function () {
@@ -964,69 +1131,168 @@
     }
     runtime.path = path; runtime.route = classifyRoute(path);
     applyRouteClasses();
-    renderShell();
     queueCritical(["shell", "campaign"]);
-    queueDeferred(["trust", "jackpot"], 700);
-  }
-  function matchesWithin(node, selector) {
-    return !!(node && node.nodeType === 1 && ((node.matches && node.matches(selector)) ||
-      (node.querySelector && node.querySelector(selector))));
+    queueDeferred(routeDeferredJobs(false), 700);
   }
   function isOwnNode(node) {
     if (!node || node.nodeType !== 1) return false;
     return (node.id && node.id.indexOf("narcos-") === 0) ||
       !!(node.closest && node.closest('[id^="narcos-"]'));
   }
-  var WATCHERS = [
-    { selector: '[data-mj="header"],[data-mj="announcement"],main[data-mj="page-content"] iframe,[data-mj="bottom-nav"]', critical: ["shell"] },
-    { selector: '[aria-label="site-header"],[data-mj="header-left"],[data-mj="header-right"],[data-mj="header-special-button"]', critical: ["header"] },
-    { selector: 'main,[data-mj="page-content"]', critical: ["campaign"], deferred: ["trust", "jackpot"] },
-    { selector: '[data-mj="mobile-nav-list"]', deferred: ["sidebar"] }, { selector: '[data-mj="widget-collection-slider"]', deferred: ["leagues"] },
-    { selector: '[data-mj="footer-top"],[data-mj="footer-nav"],[data-mj="footer-content"],footer', deferred: ["footer"] }
-  ];
+  var STRUCTURAL_MUTATION_SELECTOR = [
+    '[data-mj="header"]', '[data-mj="announcement"]', '[aria-label="site-header"]',
+    '[data-mj="header-left"]', '[data-mj="header-right"]', '[data-mj="header-special-button"]',
+    'main[data-mj="page-content"]', '[data-mj="page-content"]', "iframe", '[data-mj="bottom-nav"]',
+    '[data-mj="game-catalog-provider-bottom-sheet-search"]', '[data-mj="mobile-nav-list"]',
+    '[data-mj="widget-collection-slider"]', '[data-mj="widget-top-providers"]', '[data-mj="widget-pages"]',
+    '[data-mj="footer-top"]', '[data-mj="footer-nav"]', '[data-mj="footer-content"]', "footer"
+  ].join(",");
+  var CATALOG_NOISE_SELECTOR = [
+    '[data-mj="game-catalog-list"]', '[data-mj="game-catalog-card"]',
+    '[data-mj="widget-game-card"]', '[data-mj="game-card"]',
+    '[data-mj*="game-card"]', '[data-testid*="game-card"]', '[class*="game-card"]'
+  ].join(",");
+  function routeContentJobs(critical, deferred) {
+    var route = runtime.route || classifyRoute(cleanPath());
+    if (route.campaign) critical.campaign = true;
+    if (route.home) deferred.trust = true;
+    if (route.casino) deferred.jackpot = true;
+  }
+  function isCatalogNoiseMutation(target, node) {
+    var element = node && node.nodeType === 1 ? node : target;
+    if (!element || element.nodeType !== 1) return false;
+    if (element.matches("iframe")) return false;
+    if (element.matches(CATALOG_NOISE_SELECTOR)) {
+      if (!element.isConnected && element.querySelector && element.querySelector("iframe")) return false;
+      return true;
+    }
+    var catalogRoot = (element.closest && element.closest(CATALOG_NOISE_SELECTOR)) ||
+      (target && target.closest && target.closest(CATALOG_NOISE_SELECTOR));
+    if (!catalogRoot) return false;
+    if (element.querySelector && element.querySelector("iframe")) return false;
+    return true;
+  }
+  function classifyStructuralElement(element, critical, deferred) {
+    if (element.matches(
+      '[data-mj="header"],[data-mj="announcement"],main[data-mj="page-content"],' +
+      '[data-mj="page-content"],iframe,[data-mj="bottom-nav"]'
+    )) {
+      critical.shell = true;
+    }
+    if (element.matches(
+      '[aria-label="site-header"],[data-mj="header-left"],[data-mj="header-right"],' +
+      '[data-mj="header-special-button"]'
+    )) {
+      critical.header = true;
+    }
+    if (element.matches(
+      'main[data-mj="page-content"],[data-mj="page-content"],' +
+      '[data-mj="widget-top-providers"],[data-mj="widget-pages"]'
+    )) {
+      routeContentJobs(critical, deferred);
+    }
+    if (element.matches('[data-mj="game-catalog-provider-bottom-sheet-search"]')) {
+      localizeProviderSheet();
+    }
+    if (element.matches('[data-mj="mobile-nav-list"]')) deferred.sidebar = true;
+    if (element.matches('[data-mj="widget-collection-slider"]') &&
+        runtime.route && runtime.route.home) {
+      deferred.leagues = true;
+    }
+    if (element.matches(
+      '[data-mj="footer-top"],[data-mj="footer-nav"],[data-mj="footer-content"],footer'
+    )) {
+      deferred.footer = true;
+    }
+  }
+  function inspectMutationTree(node, target, critical, deferred) {
+    if (!node || node.nodeType !== 1 || isOwnNode(node) ||
+        isCatalogNoiseMutation(target, node)) {
+      return false;
+    }
+    if (node.matches(STRUCTURAL_MUTATION_SELECTOR)) {
+      classifyStructuralElement(node, critical, deferred);
+    }
+    var descendants = node.querySelectorAll(STRUCTURAL_MUTATION_SELECTOR);
+    Array.prototype.forEach.call(descendants, function (element) {
+      classifyStructuralElement(element, critical, deferred);
+    });
+    return true;
+  }
   function observeMutations(records) {
     var critical = Object.create(null), deferred = Object.create(null);
     records.forEach(function (record) {
-      if (record.type === "attributes" && record.target && record.target.nodeType === 1) {
-        var frameAttribute = record.target.matches && record.target.matches("iframe");
-        var frameHostAttribute = runtime.frameHosts && runtime.frameHosts.has(record.target);
-        if (frameAttribute || frameHostAttribute) {
-          critical.shell = true;
-          return;
-        }
-      }
-      var shouldReconcile = false;
+      var target = record.target && record.target.nodeType === 1 ?
+        record.target : record.target && record.target.parentElement;
+      var hasElementChange = false, hasTextChange = record.type === "characterData";
       Array.prototype.forEach.call(record.addedNodes, function (node) {
-        if (isOwnNode(node)) return;
-        shouldReconcile = true;
-        if (matchesWithin(node, 'main[data-mj="page-content"],iframe')) critical.shell = true;
-        if (matchesWithin(node, '[data-mj="game-catalog-provider-bottom-sheet-search"]')) localizeProviderSheet();
-        WATCHERS.forEach(function (watcher) {
-          if (!matchesWithin(node, watcher.selector)) return;
-          (watcher.critical || []).forEach(function (name) { critical[name] = true; });
-          (watcher.deferred || []).forEach(function (name) { deferred[name] = true; });
-        });
+        if (node && node.nodeType === 3) hasTextChange = true;
+        if (inspectMutationTree(node, target, critical, deferred)) hasElementChange = true;
       });
       Array.prototype.forEach.call(record.removedNodes, function (node) {
-        if (node && (node.nodeType === 1 || node.nodeType === 3)) shouldReconcile = true;
-        if (matchesWithin(node, 'main[data-mj="page-content"],main[data-mj="page-content"] iframe,iframe')) {
-          critical.shell = true;
+        if (node && node.nodeType === 3) hasTextChange = true;
+        if (inspectMutationTree(node, target, critical, deferred)) hasElementChange = true;
+      });
+      if (!target) return;
+      if (hasTextChange) {
+        if (target.closest(
+          '[aria-label="site-header"],[data-mj="header"],[data-mj="header-left"],' +
+          '[data-mj="header-right"]'
+        )) {
+          critical.header = true;
         }
-      });
-      if (!shouldReconcile || !record.target || record.target.nodeType !== 1) return;
-      WATCHERS.forEach(function (watcher) {
-        var target = record.target;
-        var inside = (target.matches && target.matches(watcher.selector)) ||
-          (target.closest && target.closest(watcher.selector));
-        if (!inside) return;
-        (watcher.critical || []).forEach(function (name) { critical[name] = true; });
-        (watcher.deferred || []).forEach(function (name) { deferred[name] = true; });
-      });
+        if (runtime.route && runtime.route.home &&
+            target.closest('[data-mj="widget-collection-slider"]')) {
+          deferred.leagues = true;
+        }
+        if (target.closest(
+          '[data-mj="footer-top"],[data-mj="footer-nav"],[data-mj="footer-content"],footer'
+        )) {
+          deferred.footer = true;
+        }
+      }
+      if (!hasElementChange) return;
+      if (target.closest(
+        '[aria-label="site-header"],[data-mj="header-left"],[data-mj="header-right"]'
+      )) {
+        critical.header = true;
+      }
+      if (target.closest('[data-mj="bottom-nav"]')) critical.shell = true;
+      if (target.closest("main,[data-mj='page-content']")) routeContentJobs(critical, deferred);
+      if (runtime.route && runtime.route.home &&
+          target.closest('[data-mj="widget-collection-slider"]')) {
+        deferred.leagues = true;
+      }
+      if (target.closest(
+        '[data-mj="footer-top"],[data-mj="footer-nav"],[data-mj="footer-content"],footer'
+      )) {
+        deferred.footer = true;
+      }
     });
-    if (critical.shell) {
-      delete critical.shell;
-      renderShell();
-    }
+    var criticalNames = Object.keys(critical), deferredNames = Object.keys(deferred);
+    if (criticalNames.length) queueCritical(criticalNames);
+    if (deferredNames.length) queueDeferred(deferredNames, 700);
+  }
+  function observeTextMutations(records) {
+    var critical = Object.create(null), deferred = Object.create(null);
+    records.forEach(function (record) {
+      var target = record.target && record.target.parentElement;
+      if (!target) return;
+      if (target.closest(
+        '[aria-label="site-header"],[data-mj="header-left"],[data-mj="header-right"]'
+      )) {
+        critical.header = true;
+      }
+      if (runtime.route && runtime.route.home &&
+          target.closest('[data-mj="widget-collection-slider"]')) {
+        deferred.leagues = true;
+      }
+      if (target.closest(
+        '[data-mj="footer-top"],[data-mj="footer-nav"],[data-mj="footer-content"],footer'
+      )) {
+        deferred.footer = true;
+      }
+    });
     var criticalNames = Object.keys(critical), deferredNames = Object.keys(deferred);
     if (criticalNames.length) queueCritical(criticalNames);
     if (deferredNames.length) queueDeferred(deferredNames, 700);
@@ -1110,10 +1376,13 @@
     renderHeader();
     localizeProviderSheet();
     renderCampaign();
-    queueDeferred(["trust", "jackpot", "sidebar", "leagues", "footer"], 1100);
+    queueDeferred(routeDeferredJobs(true), 1100);
   }
   function destroy() {
     if (runtime.observer) runtime.observer.disconnect();
+    if (runtime.frameObserver) runtime.frameObserver.disconnect();
+    if (runtime.headerObserver) runtime.headerObserver.disconnect();
+    if (runtime.textObserver) runtime.textObserver.disconnect();
     if (runtime.resizeObserver) runtime.resizeObserver.disconnect();
     runtime.listeners.forEach(function (entry) { entry[0].removeEventListener(entry[1], entry[2], entry[3]); });
     runtime.history.forEach(function (entry) {
@@ -1147,9 +1416,18 @@
   listen(window, "popstate", function () { handleRouteChange(false); });
   listen(window, "hashchange", function () { handleRouteChange(false); });
   listen(document, "click", onDocumentClick, true);
+  runtime.frameObserver = new MutationObserver(function (records) {
+    if (!records.length || window[GLOBAL_KEY] !== runtime) return;
+    queueCritical(["shell"]);
+  });
+  runtime.headerObserver = new MutationObserver(function (records) {
+    if (!records.length || window[GLOBAL_KEY] !== runtime) return;
+    queueCritical(["header"]);
+  });
+  runtime.textObserver = new MutationObserver(observeTextMutations);
   if (window.ResizeObserver) {
     runtime.resizeObserver = new ResizeObserver(function () {
-      if (window[GLOBAL_KEY] === runtime) renderShell();
+      if (window[GLOBAL_KEY] === runtime) queueCritical(["shell"]);
     });
   }
   refresh();
@@ -1157,8 +1435,6 @@
   runtime.observer = new MutationObserver(observeMutations);
   runtime.observer.observe(document.documentElement, {
     childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ["src", "srcdoc", "hidden", "aria-hidden", "class", "style"]
+    subtree: true
   });
 })();
