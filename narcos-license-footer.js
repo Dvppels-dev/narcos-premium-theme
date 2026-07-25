@@ -2,7 +2,7 @@
    Keeps the current public DOM contract while avoiding destructive SPA patches. */
 (function () {
   "use strict";
-  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.4.0";
+  var GLOBAL_KEY = "__narcosPremiumThemeRuntime", VERSION = "2.4.1";
   var previous = window[GLOBAL_KEY];
   if (previous && previous.version === VERSION && previous.refresh) {
     previous.refresh();
@@ -11,7 +11,7 @@
   if (previous && previous.destroy) previous.destroy();
   var VERIFY_URL = "https://verification.anjouangamblingboard.org/s/140e70a801efff238b59b01782ba34d909755fd6e27deb06c4959b328d6e9698e01f00b62578604eca16f199ebb446cb";
   var TELEGRAM_URL = "https://t.me/narcosresmi", CURRENT_URL = "https://narcosgir.com";
-  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v8";
+  var WEBSITE_URL = "https://narcosbahis.com/", SUPPORT_EMAIL = "destek@narcosbahis.com", REVISION = "v9";
   var CASINO_LOBBY_PATH = "/tr/casino/all", LIVE_CASINO_LOBBY_PATH = "/tr/livecasino/all";
   var CALL_REQUEST_PATH = "/tr/aranmatalep";
   function getBaseUrl() {
@@ -534,12 +534,27 @@
     button.href = gameLobbyUrl();
     return true;
   }
+  function normalizeBottomNav() {
+    var navs = document.querySelectorAll('[data-mj="bottom-nav"]');
+    Array.prototype.forEach.call(navs, function (nav) {
+      Array.prototype.forEach.call(
+        nav.querySelectorAll('[data-mj="bottom-nav-item"] p'),
+        function (label) {
+          if (label.textContent.trim().toLocaleLowerCase("tr-TR") === "promosyonlar") {
+            label.textContent = "Promosyon";
+          }
+        }
+      );
+    });
+    return navs.length > 0;
+  }
   function renderShell() {
     pruneShellNodes();
     pruneFrameNodes();
     pruneTextRoots();
     var header = activeHeader();
     var main = activePageMain();
+    normalizeBottomNav();
     renderInfoStrip(header);
     renderGameReturn(syncEmbeddedGameState(main), header);
     return true;
