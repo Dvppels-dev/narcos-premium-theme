@@ -1,7 +1,6 @@
 /*! narcos-footer-birlesik.js
  * Taban: narcos-license-footer.js @ 2721b32d6c0356a5a2f63432dce9d5108c997460
- * + spor rota duzeltmesi
- * + panel gomme (iframe)
+ * + spor rota duzeltmesi + panel gomme (iframe)
  */
 /* NarcosBahis production premium theme runtime v2.
    Keeps the current public DOM contract while avoiding destructive SPA patches. */
@@ -1566,7 +1565,17 @@
     var mevcut = document.getElementById(KAP_ID);
 
     if (!hedef) {                       // eşleşmeyen sayfada kalıntı bırakma
-      if (mevcut) mevcut.remove();
+      if (mevcut) {
+        var ust = mevcut.parentElement;
+        mevcut.remove();
+        if (ust) {                      // gizlediğimiz içeriği geri aç
+          var gizli = ust.querySelectorAll("[data-ng-gizli]");
+          for (var j = 0; j < gizli.length; j++) {
+            gizli[j].style.display = gizli[j].getAttribute("data-ng-gizli") || "";
+            gizli[j].removeAttribute("data-ng-gizli");
+          }
+        }
+      }
       return;
     }
     if (mevcut) {                       // zaten var; hedef değiştiyse güncelle
@@ -1577,6 +1586,19 @@
 
     var yer = icerikAlani();
     if (!yer) return;                   // henüz render olmadı, gözlemci tekrar dener
+
+    // React'in yönettiği düğümleri SİLMEYİZ. innerHTML="" kullanılırsa React
+    // kendi çocuklarını bulamayıp "removeChild: node is not a child" ile
+    // çöküyor. Bunun yerine mevcut içerik CSS ile gizlenir, iframe eklenir.
+    for (var i = 0; i < yer.children.length; i++) {
+      var c = yer.children[i];
+      if (c.id !== KAP_ID) {
+        if (!c.hasAttribute("data-ng-gizli")) {
+          c.setAttribute("data-ng-gizli", c.style.display || "");
+        }
+        c.style.display = "none";
+      }
+    }
 
     var kap = document.createElement("div");
     kap.id = KAP_ID;
@@ -1593,7 +1615,6 @@
       "display:block;width:100%;height:100%;min-height:inherit;border:0;";
     kap.appendChild(ifr);
 
-    yer.innerHTML = "";                 // kategori sayfasının boş içeriğini temizle
     yer.appendChild(kap);
   }
 
