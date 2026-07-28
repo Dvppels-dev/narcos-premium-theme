@@ -10,9 +10,14 @@
 (function () {
   "use strict";
 
+  // CMS'teki gameCatalog "identifier" değerleri. Aynı sayfanın menülere göre
+  // farklı identifier'ı olabiliyor: header'da "narcoscark" (Patron Çark),
+  // burger menüde "tacowheel" (Narcos Çark) — ikisi de gerçek sayfa (HTTP 200).
+  // Biri eksik kalırsa o menüden gelen kullanıcı boş sayfa görüyor.
   var HARITA = {
     "/bonusrequest": "https://narcosbahis.vip/#/bonus-talep",
     "/narcoscark":   "https://narcosbahis.vip/#/cark",
+    "/tacowheel":    "https://narcosbahis.vip/#/cark",
     "/aranmatalep":  "https://narcosbahis.vip/#/beni-ara",
     "/narcosskor":   "https://narcosbahis.vip/#/skor-tahmin"
   };
@@ -27,27 +32,67 @@
    * Panel iframe'i farklı origin'de olduğu için değeri postMessage ile iletiriz.
    */
   var kullaniciAdi = null;
-  var kullaniciSoruldu = false;
+  var sonDeneme = 0;
+  var istekUcuyor = false;
+
+  // /api/v1/me gövdesinin tam şekli belgelenmemiş ve sürümle değişebiliyor.
+  // Sabit bir alan adına bel bağlamak yerine yanıtı gezip kullanıcı adı
+  // anlamına gelen ilk makul alanı buluruz. E-posta/ID gibi alanları
+  // kullanmayız; onlar Lynon'daki "login" ile eşleşmez.
+  var AD_ALANLARI = /^(username|userName|user_name|login|userLogin|nickname|nickName|memberName|accountName)$/;
 
   function kullaniciAdiCoz(veri) {
-    if (!veri || typeof veri !== "object") return null;
-    var aday = veri.username || veri.userName || veri.login ||
-               (veri.data && (veri.data.username || veri.data.userName || veri.data.login));
-    aday = aday == null ? "" : String(aday).trim();
-    return aday || null;
+    var bulunan = null;
+    var derinlik = 0;
+
+    (function gez(o) {
+      if (bulunan || o == null || derinlik > 6) return;
+      if (Array.isArray(o)) {
+        derinlik++;
+        for (var i = 0; i < o.length && !bulunan; i++) gez(o[i]);
+        derinlik--;
+        return;
+      }
+      if (typeof o !== "object") return;
+      for (var k in o) {
+        if (!Object.prototype.hasOwnProperty.call(o, k)) continue;
+        var v = o[k];
+        if (AD_ALANLARI.test(k) && typeof v === "string" && v.trim()) {
+          bulunan = v.trim();
+          return;
+        }
+        if (v && typeof v === "object") {
+          derinlik++;
+          gez(v);
+          derinlik--;
+          if (bulunan) return;
+        }
+      }
+    })(veri);
+
+    return bulunan;
   }
 
+  /**
+   * Kullanıcı adını getirir. Başarılı sonuç kalıcı olarak saklanır; başarısızsa
+   * (anonim -> 401) yeniden denenebilir, çünkü oyuncu sayfayı yenilemeden
+   * giriş modalinden giriş yapabiliyor. Ardışık istekleri 5 sn'ye kısarız.
+   */
   function kullaniciyiGetir() {
-    if (kullaniciSoruldu) return Promise.resolve(kullaniciAdi);
-    kullaniciSoruldu = true;
+    if (kullaniciAdi) return Promise.resolve(kullaniciAdi);
     if (typeof fetch !== "function") return Promise.resolve(null);
+    var simdi = new Date().getTime();
+    if (istekUcuyor || simdi - sonDeneme < 5000) return Promise.resolve(null);
+    sonDeneme = simdi;
+    istekUcuyor = true;
     return fetch("/api/v1/me", {
       credentials: "same-origin",
       headers: { Accept: "application/json" }
     })
       .then(function (y) { return y.ok ? y.json() : null; })
       .then(function (veri) { kullaniciAdi = kullaniciAdiCoz(veri); return kullaniciAdi; })
-      .catch(function () { return null; });
+      .catch(function () { return null; })
+      .then(function (r) { istekUcuyor = false; return r; });
   }
 
   /** Panele kimliği bildir. Panel hazır olmadan gelen mesajları kaçırmamak için
@@ -175,11 +220,12 @@
 
   // SPA içeriği geç render ederse kabı yeniden yerleştir. Kap zaten duruyorsa
   // da çalışmalı: CMS sonradan düğüm eklediğinde ("No categories") onları
-  // gizleyen tek nokta burası.
+  // gizleyen tek nokta burası. hedefBul() null iken de çağırırız; goster()
+  // o durumda eşleşmeyen sayfadaki kalıntıyı temizler.
   if (typeof MutationObserver === "function" && document.body) {
     var bekliyor = false;
     var gozlemci = new MutationObserver(function () {
-      if (bekliyor || !hedefBul()) return;
+      if (bekliyor) return;
       // Kendi DOM değişikliğimiz gözlemciyi tekrar tetikliyor; sonsuz döngüyü
       // ve her mutasyonda tam tarama maliyetini önlemek için tek kareye topla.
       bekliyor = true;
@@ -190,4 +236,29 @@
     });
     gozlemci.observe(document.body, { childList: true, subtree: true });
   }
+
+  // Adres değişimini doğrudan izle.
+  //
+  // pushState sarmalaması tek başına YETMİYOR: bu script defer ile yükleniyor,
+  // yani SPA paketi (zone.js) history metodlarını bizden önce yamalıyor ve
+  // router kendi referansını tutabiliyor. Header ve mobil menü öğeleri <a>
+  // linki de değil (yalnızca giriş/kayıt bağlantıları <a>), dolayısıyla tıklama
+  // yakalanamıyordu — "aranma talep ikonu iframe açmıyor" sorunu buydu.
+  //
+  // 400 ms'lik yol karşılaştırması çerçeveden bağımsız çalışır ve maliyeti
+  // ihmal edilebilir (tek string karşılaştırması).
+  var sonYol = location.pathname;
+  setInterval(function () {
+    if (location.pathname !== sonYol) {
+      sonYol = location.pathname;
+      planla();
+      return;
+    }
+    // Oyuncu sayfayı yenilemeden giriş modalinden giriş yapabiliyor. Kimliği
+    // henüz alamadıysak eşleşen sayfada denemeye devam et (istek 5 sn'ye kısık).
+    if (kullaniciAdi || !hedefBul()) return;
+    var kap = document.getElementById(KAP_ID);
+    var ifr = kap && kap.querySelector("iframe");
+    if (ifr) kullaniciyiGetir().then(function () { kimligiYolla(ifr); });
+  }, 400);
 })();
