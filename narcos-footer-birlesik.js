@@ -442,6 +442,14 @@
   function isPotentialGameFrame(frame) {
     if (!frame || frame.id === "phoenix365ifraim") return false;
     if (frame.closest && frame.closest("#sportsbook-wrapper")) return false;
+    // Panel gömmesi (narcos-panel-gomme.js) oyun DEĞİLDİR.
+    //
+    // Panel iframe'i içerik alanındaki tek iframe olduğu için, önceki bir casino
+    // oturumundan "pending game return" kalmışsa contextualGameRoute true oluyor
+    // ve bu kare oyun sanılıp ng-game-embed tam ekran moduna sokuluyordu.
+    // Kullanıcıya "iframe yerine tam ekran açıyor" olarak yansıyan davranış buydu.
+    if (frame.hasAttribute && frame.hasAttribute("data-ng-panel")) return false;
+    if (frame.closest && frame.closest("#narcos-panel-frame")) return false;
     var source = (frame.getAttribute("src") || "").trim();
     if (/(?:captcha|recaptcha|hcaptcha|turnstile|youtube|vimeo|verification|live-chat)/i.test(source)) return false;
     return true;

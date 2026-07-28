@@ -107,6 +107,35 @@
     } catch (e) { /* iframe henüz yüklenmemiş olabilir */ }
   }
 
+  /**
+   * Sitenin kendi hesap modallarını panele yönlendiren sorgu eşlemesi.
+   *
+   * "?m=account&t=bonus_offers" sitenin hesap menüsündeki bonus teklifleri
+   * modalini açıyor. Bu modal panelin bonus talep ekranının üstüne binerek onu
+   * gizliyordu. Parametreleri temizleyip yolu bonus sayfasına çekiyoruz; modal
+   * kapanıyor, geriye iframe kalıyor.
+   */
+  var MODAL_ESLEME = [
+    { m: "account", t: "bonus_offers", yol: "/tr/bonusrequest" }
+  ];
+
+  function modalYonlendir() {
+    var p = new URLSearchParams(location.search);
+    var m = (p.get("m") || "").toLowerCase();
+    var t = (p.get("t") || "").toLowerCase();
+    if (!m && !t) return false;
+
+    for (var i = 0; i < MODAL_ESLEME.length; i++) {
+      var e = MODAL_ESLEME[i];
+      if (m !== e.m || t !== e.t) continue;
+      // Yalnızca sorgu parametrelerini düşür; geri tuşunda modale dönülmesin
+      // diye replaceState kullanılır (yeni geçmiş kaydı oluşturmaz).
+      history.replaceState(history.state, "", e.yol);
+      return true;
+    }
+    return false;
+  }
+
   function hedefBul() {
     var yol = (location.pathname || "/").toLowerCase().replace(/\/+$/, "");
     var dilsiz = yol.replace(/^\/[a-z]{2}(?=\/)/, "");
@@ -145,6 +174,7 @@
   }
 
   function goster() {
+    modalYonlendir();                   // sorgu tabanlı modalleri panele çevir
     var hedef = hedefBul();
     var mevcut = document.getElementById(KAP_ID);
 
@@ -186,6 +216,9 @@
     ifr.setAttribute("loading", "lazy");
     ifr.setAttribute("title", "Narcos Panel");
     ifr.setAttribute("allow", "clipboard-write");
+    // Footer script'inin oyun karesi tespitine yakalanmamak için işaret:
+    // aksi halde ng-game-embed tam ekran moduna sokuluyordu.
+    ifr.setAttribute("data-ng-panel", "1");
     ifr.style.cssText =
       "display:block;width:100%;height:100%;min-height:inherit;border:0;";
     kap.appendChild(ifr);
@@ -247,10 +280,12 @@
   //
   // 400 ms'lik yol karşılaştırması çerçeveden bağımsız çalışır ve maliyeti
   // ihmal edilebilir (tek string karşılaştırması).
-  var sonYol = location.pathname;
+  // Yol VE sorgu birlikte izlenir: modal açılışları yolu değiştirmeden yalnızca
+  // sorguyu değiştiriyor (?m=account&t=bonus_offers), bu da yakalanmalı.
+  var sonAdres = location.pathname + location.search;
   setInterval(function () {
-    if (location.pathname !== sonYol) {
-      sonYol = location.pathname;
+    if (location.pathname + location.search !== sonAdres) {
+      sonAdres = location.pathname + location.search;
       planla();
       return;
     }
