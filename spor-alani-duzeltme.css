@@ -1,0 +1,84 @@
+/* ============================================================
+   Spor alanı düzeltmesi — narcosbahis
+   Mevcut temadan SONRA yüklenmeli.
+
+   Canlı sayfada (/tr/spor/demo) doğrulanan iki sorun:
+   1) ng-sports-route sınıfı Türkçe yolda uygulanmıyor
+   2) #sportsbook-wrapper main altında 3. seviyede; tema 1-2 hedefliyor
+
+   ÖNEMLİ: yalnızca rota desenini düzeltmek yetmez, kötüleştirir.
+   Canlı denemede sınıf eklenince yükseklik 560px -> 0px düştü.
+   Bu dosya derinlik zincirini derinlikten bağımsız hale getirir.
+   ============================================================ */
+
+/* --- 1. Derinlikten bağımsız zincir -------------------------------
+   Wrapper kaç seviye derinde olursa olsun, aradaki tüm sarmalayıcılar
+   yükseklik aktarır. Tema kuralları (1-2 seviye) buna dahil.        */
+html.ng-sports-route:has(#sportsbook-wrapper)
+  main[data-mj="page-content"] :has(#sportsbook-wrapper) {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  height: auto !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+/* --- 2. Wrapper her koşulda ölçülebilir alan alsın ---------------- */
+#sportsbook-wrapper {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: min(560px, 70vh) !important;
+  overflow: hidden !important;
+}
+
+html.ng-sports-route:has(#sportsbook-wrapper) #sportsbook-wrapper {
+  flex: 1 1 auto !important;
+  height: auto !important;
+}
+
+/* --- 3. Iframe wrapper'ı doldursun -------------------------------- */
+#sportsbook-wrapper iframe,
+#phoenix365ifraim {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: inherit !important;
+  border: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* --- 4. Rota sınıfı hiç gelmediyse (şu anki durum) ----------------
+   Tam ekran kuralları devreye girmez; sayfa normal akışta kalır ve
+   spor alanı kendi yüksekliğiyle görünür.                          */
+html:not(.ng-sports-route) #sportsbook-wrapper {
+  height: clamp(560px, calc(100vh - 220px), 920px) !important;
+}
+
+/* --- 5. :has() desteklenmeyen tarayıcılar --------------------------
+   Zincir kurulamazsa tam ekran kilidini aç, wrapper görünür kalsın. */
+@supports not selector(:has(*)) {
+  html.ng-sports-route,
+  html.ng-sports-route body {
+    height: auto !important;
+    overflow: auto !important;
+  }
+  #sportsbook-wrapper {
+    height: clamp(560px, calc(100vh - 170px), 920px) !important;
+  }
+}
+
+/* --- 6. Mobil: 100vh adres çubuğu altında kalmasın ---------------- */
+@media (max-width: 767px) {
+  #sportsbook-wrapper {
+    min-height: min(520px, 68dvh) !important;
+  }
+  html.ng-sports-route:has(#sportsbook-wrapper) #root {
+    height: 100dvh !important;
+  }
+}
