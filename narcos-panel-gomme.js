@@ -216,6 +216,9 @@
     ifr.setAttribute("loading", "lazy");
     ifr.setAttribute("title", "Narcos Panel");
     ifr.setAttribute("allow", "clipboard-write");
+    // Footer script'inin oyun karesi tespitine yakalanmamak için işaret:
+    // aksi halde ng-game-embed tam ekran moduna sokuluyordu.
+    ifr.setAttribute("data-ng-panel", "1");
     ifr.style.cssText =
       "display:block;width:100%;height:100%;min-height:inherit;border:0;";
     kap.appendChild(ifr);
