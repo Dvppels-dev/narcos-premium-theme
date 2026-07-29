@@ -1629,3 +1629,23 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
     height: 100dvh !important;
   }
 }
+
+/* --- 7. Panel gömülü sayfalar: mobil düzen ------------------------
+ * html.ng-panel-route ve html.ng-panel-<sayfa> sınıflarını
+ * narcos-panel-gomme.js ekler. Kabın yüksekliği de orada, kendi üst
+ * konumundan hesaplanır; burada yalnızca çevresini sadeleştiriyoruz.
+ */
+@media (max-width: 620px) {
+  /* Bonus talepte yalnızca header ve gezinme kalsın: bilgi şeridi
+   * ("Güncel giriş: ...") dar ekranda iframe'e ayrılan yeri yiyordu. */
+  html.ng-panel-bonus-talep .ng-info-strip {
+    display: none !important;
+  }
+
+  /* Kap ekran sonuna kadar uzuyor; altında boşluk bırakan dış dolgular
+   * ikinci bir kaydırma alanı yaratıyordu. */
+  html.ng-panel-route #narcos-panel-frame {
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+}

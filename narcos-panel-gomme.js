@@ -116,7 +116,10 @@
    * kapanıyor, geriye iframe kalıyor.
    */
   var MODAL_ESLEME = [
-    { m: "account", t: "bonus_offers", yol: "/tr/bonusrequest" }
+    { m: "account", t: "bonus_offers", yol: "/tr/bonusrequest" },
+    // Anlık iade modali da aynı sayfayı kaplıyor; hesap menüsünde bonus
+    // tekliflerinin hemen yanında duruyor ve oyuncular ikisini de kullanıyor.
+    { m: "account", t: "instant_cashback", yol: "/tr/bonusrequest" }
   ];
 
   function modalYonlendir() {
@@ -140,6 +143,49 @@
     var yol = (location.pathname || "/").toLowerCase().replace(/\/+$/, "");
     var dilsiz = yol.replace(/^\/[a-z]{2}(?=\/)/, "");
     return HARITA[dilsiz] || HARITA[yol] || null;
+  }
+
+  /**
+   * Panel sayfalarını CSS'e bildirir: html.ng-panel-route + html.ng-panel-<sayfa>.
+   * Mevcut ng-*-route kuralına uyar. Gömme sayfasına özel düzen (ör. bonus
+   * talepte bilgi şeridini gizlemek) böylece yalnızca CSS ile yapılabilir.
+   */
+  function rotaSinifi(hedef) {
+    var kok = document.documentElement;
+    var eski = (kok.className || "").split(/\s+/).filter(function (s) {
+      return s && s.indexOf("ng-panel-") !== 0;
+    });
+    if (hedef) {
+      var slug = (hedef.split("#/")[1] || "").replace(/[^a-z0-9-]/gi, "");
+      eski.push("ng-panel-route");
+      if (slug) eski.push("ng-panel-" + slug);
+    }
+    kok.className = eski.join(" ");
+  }
+
+  /**
+   * Mobilde kabı, başladığı noktadan ekran sonuna kadar uzatır.
+   *
+   * Sabit min-height (82vh) sayfayı iki kaydırma alanına bölüyordu: dışta site,
+   * içte iframe. Parmak hangisini yakalayacağı belirsizdi ve "zor kaydırılıyor"
+   * şikayeti buradan geliyordu. Yükseklik kabın kendi üst konumundan
+   * hesaplanınca dış sayfada kaydıracak yer kalmıyor; tek kaydırma alanı
+   * iframe'in içi oluyor.
+   *
+   * 100dvh kullanılır: mobil tarayıcının adres çubuğu gizlenip açılırken
+   * 100vh yanlış (fazla) ölçüp sayfanın altını taşırıyordu.
+   */
+  function mobilYukseklik(kap) {
+    if (!kap) return;
+    var mobil = window.matchMedia("(max-width: 620px)").matches;
+    if (!mobil) {
+      kap.style.height = "";
+      kap.style.minHeight = "min(760px,82vh)";
+      return;
+    }
+    var ust = Math.max(0, Math.round(kap.getBoundingClientRect().top));
+    kap.style.minHeight = "0";
+    kap.style.height = "calc(100dvh - " + ust + "px)";
   }
 
   function icerikAlani() {
@@ -177,6 +223,7 @@
     modalYonlendir();                   // sorgu tabanlı modalleri panele çevir
     var hedef = hedefBul();
     var mevcut = document.getElementById(KAP_ID);
+    rotaSinifi(hedef);                  // CSS'in sayfayı tanıması için
 
     if (!hedef) {                       // eşleşmeyen sayfada kalıntı bırakma
       if (mevcut) {
@@ -197,6 +244,7 @@
       if (f && f.src !== hedef) f.src = hedef;
       // Kap yerindeyken CMS yeni düğüm eklemiş olabilir ("No categories").
       kardesleriGizle(mevcut.parentElement);
+      mobilYukseklik(mevcut);
       return;
     }
 
@@ -224,11 +272,21 @@
     kap.appendChild(ifr);
 
     yer.appendChild(kap);
+    mobilYukseklik(kap);
 
     // Panel yüklendiğinde kimliği bildir; kullanıcı bilgisi geç gelirse de tekrar.
     ifr.addEventListener("load", function () { kimligiYolla(ifr); });
     kullaniciyiGetir().then(function () { kimligiYolla(ifr); });
   }
+
+  // Ekran döndürme, adres çubuğunun gizlenmesi ve masaüstü/mobil sınırının
+  // aşılması yüksekliği geçersiz kılar; yeniden ölç.
+  window.addEventListener("resize", function () {
+    mobilYukseklik(document.getElementById(KAP_ID));
+  });
+  window.addEventListener("orientationchange", function () {
+    setTimeout(function () { mobilYukseklik(document.getElementById(KAP_ID)); }, 150);
+  });
 
   // Panel "hazırım" derse kimliği (yeniden) gönder. Böylece iframe'in yüklenme
   // anı ile /api/v1/me yanıtının sırası önemsizleşir.
