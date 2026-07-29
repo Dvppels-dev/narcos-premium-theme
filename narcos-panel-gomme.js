@@ -164,28 +164,37 @@
   }
 
   /**
-   * Mobilde kabı, başladığı noktadan ekran sonuna kadar uzatır.
+   * Yalnızca dejenere durum koruması: header beklenmedik biçimde uzunsa
+   * (100dvh - üst) sıfıra/negatife düşüp kabı yok edebilir.
    *
-   * Sabit min-height (82vh) sayfayı iki kaydırma alanına bölüyordu: dışta site,
-   * içte iframe. Parmak hangisini yakalayacağı belirsizdi ve "zor kaydırılıyor"
-   * şikayeti buradan geliyordu. Yükseklik kabın kendi üst konumundan
-   * hesaplanınca dış sayfada kaydıracak yer kalmıyor; tek kaydırma alanı
-   * iframe'in içi oluyor.
-   *
-   * 100dvh kullanılır: mobil tarayıcının adres çubuğu gizlenip açılırken
-   * 100vh yanlış (fazla) ölçüp sayfanın altını taşırıyordu.
+   * Bilerek düşük tutuldu. Yüksek bir taban (ör. 520) kısa masaüstü
+   * pencerelerinde kabı ekrandan uzun yapıp dış kaydırmayı geri getiriyordu —
+   * 800x450'de ölçüldü: taban 520 iken belge 520 > ekran 450, yani yine iki
+   * kaydırma alanı. 320 ile gerçek cihazların tamamında tam oturuyor.
    */
-  function mobilYukseklik(kap) {
+  var TABAN_YUKSEKLIK = 320;
+
+  /**
+   * Kabı, başladığı noktadan ekran sonuna kadar uzatır — masaüstünde de mobilde de.
+   *
+   * Önceden masaüstü sabit `min(760px,82vh)` kullanıyordu, mobil ise ekranı
+   * dolduruyordu; iki platform farklı davranıyordu. Sabit yükseklik sayfayı iki
+   * kaydırma alanına bölüyor (dışta site, içte iframe) ve panelin alt kısmı dar
+   * bir kutuda sıkışıyordu. Aynı hesap her genişlikte uygulanınca davranış tek
+   * tipleşiyor: dış sayfada kaydıracak yer kalmıyor, tek kaydırma alanı iframe.
+   *
+   * Yükseklik kabın KENDİ üst konumundan ölçülür; header/gezinme yüksekliği
+   * platforma veya giriş durumuna göre değişse de doğru kalır, seçici
+   * hardcode edilmez.
+   *
+   * 100dvh kullanılır: mobil tarayıcının adres çubuğu gizlenip açılırken 100vh
+   * fazla ölçüp sayfanın altını taşırıyordu. Masaüstünde dvh == vh.
+   */
+  function panelYuksekligi(kap) {
     if (!kap) return;
-    var mobil = window.matchMedia("(max-width: 620px)").matches;
-    if (!mobil) {
-      kap.style.height = "";
-      kap.style.minHeight = "min(760px,82vh)";
-      return;
-    }
     var ust = Math.max(0, Math.round(kap.getBoundingClientRect().top));
-    kap.style.minHeight = "0";
-    kap.style.height = "calc(100dvh - " + ust + "px)";
+    kap.style.minHeight = TABAN_YUKSEKLIK + "px";
+    kap.style.height = "max(" + TABAN_YUKSEKLIK + "px, calc(100dvh - " + ust + "px))";
   }
 
   function icerikAlani() {
@@ -244,7 +253,7 @@
       if (f && f.src !== hedef) f.src = hedef;
       // Kap yerindeyken CMS yeni düğüm eklemiş olabilir ("No categories").
       kardesleriGizle(mevcut.parentElement);
-      mobilYukseklik(mevcut);
+      panelYuksekligi(mevcut);
       return;
     }
 
@@ -255,8 +264,10 @@
 
     var kap = document.createElement("div");
     kap.id = KAP_ID;
+    // Yükseklik panelYuksekligi() ile hemen altta ayarlanır; burada sabit bir
+    // değer bırakmıyoruz ki ilk karede yanlış boyda görünüp zıplamasın.
     kap.style.cssText =
-      "width:100%;min-height:min(760px,82vh);overflow:hidden;" +
+      "width:100%;overflow:hidden;" +
       "border-radius:16px;background:#09090b;margin:0 auto;";
 
     var ifr = document.createElement("iframe");
@@ -272,7 +283,7 @@
     kap.appendChild(ifr);
 
     yer.appendChild(kap);
-    mobilYukseklik(kap);
+    panelYuksekligi(kap);
 
     // Panel yüklendiğinde kimliği bildir; kullanıcı bilgisi geç gelirse de tekrar.
     ifr.addEventListener("load", function () { kimligiYolla(ifr); });
@@ -282,10 +293,10 @@
   // Ekran döndürme, adres çubuğunun gizlenmesi ve masaüstü/mobil sınırının
   // aşılması yüksekliği geçersiz kılar; yeniden ölç.
   window.addEventListener("resize", function () {
-    mobilYukseklik(document.getElementById(KAP_ID));
+    panelYuksekligi(document.getElementById(KAP_ID));
   });
   window.addEventListener("orientationchange", function () {
-    setTimeout(function () { mobilYukseklik(document.getElementById(KAP_ID)); }, 150);
+    setTimeout(function () { panelYuksekligi(document.getElementById(KAP_ID)); }, 150);
   });
 
   // Panel "hazırım" derse kimliği (yeniden) gönder. Böylece iframe'in yüklenme
