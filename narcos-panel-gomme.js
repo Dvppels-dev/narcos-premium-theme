@@ -190,11 +190,58 @@
    * 100dvh kullanılır: mobil tarayıcının adres çubuğu gizlenip açılırken 100vh
    * fazla ölçüp sayfanın altını taşırıyordu. Masaüstünde dvh == vh.
    */
+  /**
+   * Ekranın altına sabitlenmiş çubuğun (mobil gezinme barı) yüksekliği.
+   *
+   * Bu çubuk `position: fixed` olduğu için sayfa akışında yer kaplamaz: kap
+   * ekranın sonuna kadar uzatıldığında çubuk iframe'in ÜZERİNE biniyor ve
+   * panelin alt kısmı — ör. bonus talep modalinin butonları — görünmez oluyordu.
+   * "Mobilde kesik çıkıyor" şikayeti buydu.
+   *
+   * Yükseklik gibi bu da çalışma anında ölçülür: seçici hardcode etmiyoruz,
+   * çünkü çubuk yalnızca mobilde ve yalnızca bazı sayfalarda render ediliyor.
+   */
+  // panelYuksekligi() goster() içinden, yani her DOM mutasyon karesinde
+  // çağrılıyor. Tüm ağacı gezip getComputedStyle okumak orada pahalı olur;
+  // sonucu kısa süre önbellekliyoruz. Ölçüyü geçersiz kılan olaylar (resize,
+  // orientationchange) önbelleği sıfırlar.
+  var altCubukOnbellek = { deger: 0, zaman: 0 };
+  var ALT_CUBUK_TAZE_MS = 1000;
+
+  function altCubukOnbelleginiSifirla() { altCubukOnbellek.zaman = 0; }
+
+  function altCubukYuksekligi() {
+    var simdi = new Date().getTime();
+    if (simdi - altCubukOnbellek.zaman < ALT_CUBUK_TAZE_MS) return altCubukOnbellek.deger;
+
+    var enFazla = 0;
+    var ekranH = window.innerHeight;
+    var dugumler = document.body ? document.body.querySelectorAll("*") : [];
+    for (var i = 0; i < dugumler.length; i++) {
+      var el = dugumler[i];
+      if (el.id === KAP_ID || el.closest("#" + KAP_ID)) continue;
+      var cs = window.getComputedStyle(el);
+      if (cs.position !== "fixed" && cs.position !== "sticky") continue;
+      if (cs.display === "none" || cs.visibility === "hidden") continue;
+      var r = el.getBoundingClientRect();
+      // Ekranın dibine yapışık, yeterince geniş ve gerçek yüksekliği olan.
+      if (r.height < 24 || r.height > ekranH * 0.4) continue;
+      if (r.width < window.innerWidth * 0.6) continue;
+      if (r.bottom < ekranH - 4 || r.top > ekranH) continue;
+      if (r.height > enFazla) enFazla = r.height;
+    }
+    altCubukOnbellek.deger = Math.round(enFazla);
+    altCubukOnbellek.zaman = simdi;
+    return altCubukOnbellek.deger;
+  }
+
   function panelYuksekligi(kap) {
     if (!kap) return;
     var ust = Math.max(0, Math.round(kap.getBoundingClientRect().top));
+    var alt = altCubukYuksekligi();
     kap.style.minHeight = TABAN_YUKSEKLIK + "px";
-    kap.style.height = "max(" + TABAN_YUKSEKLIK + "px, calc(100dvh - " + ust + "px))";
+    kap.style.height =
+      "max(" + TABAN_YUKSEKLIK + "px, calc(100dvh - " + (ust + alt) + "px))";
   }
 
   function icerikAlani() {
@@ -293,10 +340,14 @@
   // Ekran döndürme, adres çubuğunun gizlenmesi ve masaüstü/mobil sınırının
   // aşılması yüksekliği geçersiz kılar; yeniden ölç.
   window.addEventListener("resize", function () {
+    altCubukOnbelleginiSifirla();
     panelYuksekligi(document.getElementById(KAP_ID));
   });
   window.addEventListener("orientationchange", function () {
-    setTimeout(function () { panelYuksekligi(document.getElementById(KAP_ID)); }, 150);
+    setTimeout(function () {
+      altCubukOnbelleginiSifirla();
+      panelYuksekligi(document.getElementById(KAP_ID));
+    }, 150);
   });
 
   // Panel "hazırım" derse kimliği (yeniden) gönder. Böylece iframe'in yüklenme
