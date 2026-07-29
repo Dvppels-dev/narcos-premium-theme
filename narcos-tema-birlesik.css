@@ -1648,4 +1648,12 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
     border-radius: 0 !important;
     margin: 0 !important;
   }
+
+  /* Site footer'ı dar ekranda panelin altında uzun bir kuyruk bırakıyor ve
+   * sayfayı ikinci kez kaydırılabilir yapıyor. Spor rotasında da aynı
+   * yaklasim uygulanıyor (bkz. html.ng-sports-route kuralı). */
+  html.ng-panel-bonus-talep [data-mj="footer"],
+  html.ng-panel-bonus-talep footer {
+    display: none !important;
+  }
 }
