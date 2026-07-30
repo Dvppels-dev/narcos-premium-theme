@@ -178,6 +178,19 @@ main [role="textbox"]:focus {
   background: linear-gradient(180deg, rgba(7, 8, 12, .66), rgba(12, 12, 17, .42)) !important;
   border-bottom: 1px solid rgba(242, 213, 138, .34) !important;
   box-shadow: 0 12px 34px rgba(0, 0, 0, .3) !important;
+  /* Header kendi yigin baglamini kursun.
+   * Onceden z-index yoktu: sayfa icindeki yuksek z-index'li ogeler (slider
+   * oklari, modal tetikleyicileri) header'in ustune ciKiyor ya da tam tersi
+   * header icerigi ortuyordu — hangisinin kazandigi DOM sirasina kaliyordu. */
+  position: relative !important;
+  z-index: 40 !important;
+}
+
+/* Sayfa icerigi header'in ALTINDA kalsin; kendi yigininda yuksek deger
+ * kullanan bilesenler header'i asamasin. */
+[data-mj="page-content"] {
+  position: relative;
+  z-index: 1;
 }
 [data-mj="custom-header"],
 [aria-label="site-header"],
@@ -188,7 +201,31 @@ main [role="textbox"]:focus {
 }
 [aria-label="site-header"] { position: relative !important; }
 [data-mj="custom-header"] { min-height: 64px !important; }
-[data-mj="header-nav"] { min-height: 56px !important; background: rgba(18, 18, 24, .42) !important; }
+/* Aranma talep ikonu kaldirildi (bkz. narcos-footer-birlesik.js).
+ * CSS tarafinda da bastiriyoruz: jsDelivr onbelleginde eski JS kalirsa ikon
+ * yeniden uretilebilir, o durumda bile gorunmesin. */
+[data-mj="header"] #narcos-call-button,
+[data-mj="header"] .ng-call-button { display: none !important; }
+
+/* Header alt seridi: daha kompakt ve altin vurgulu.
+ * 56px notr gri bir bant, header'in yarisini kaplayip icerigi asagi
+ * itiyordu; ust satirla arasinda da renk farki yoktu. */
+[data-mj="header-nav"] {
+  min-height: 44px !important;
+  background:
+    linear-gradient(180deg, rgba(231, 197, 116, .07), rgba(18, 18, 24, .5)) !important;
+  border-top: 1px solid rgba(231, 197, 116, .12) !important;
+}
+[data-mj="header-nav"] a {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  font-size: 12px !important;
+}
+/* Bulundugun bolum altin; nav artik duz gri bir seride benzemiyor. */
+[data-mj="header-nav"] a[aria-current="page"],
+[data-mj="header-nav"] a.active {
+  color: #e7c574 !important;
+}
 [aria-label="site-header"]::after {
   content: ""; position: absolute;
   left: 8%; right: 8%; bottom: -1px; height: 1px;
@@ -1713,7 +1750,8 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
   #narcos-mobil-kisayol {
     position: sticky;
     top: 0;
-    z-index: 29;
+    /* Header 40; serit onun altinda kalmali, ustune binmemeli. */
+    z-index: 30;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 2px;

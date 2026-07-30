@@ -388,9 +388,60 @@
     }
   }
 
+  /**
+   * Mobil alt navbar'da tek aktif oge birakir.
+   *
+   * CMS "Ana Sayfa"yi href="/" ile isaretliyor ve aktiflik testini onek
+   * eslesmesiyle yapiyor; "/" her yolun oneki oldugu icin Ana Sayfa hicbir
+   * zaman sonmuyor. Sonuc: /para-yatir'dayken hem Ana Sayfa hem Para Yatir
+   * aktif gorunuyordu.
+   *
+   * Cozum: en UZUN eslesen href kazanir (en ozgul rota), digerlerinden aktif
+   * isaretleri alinir. Hicbiri eslesmezse Ana Sayfa'ya dokunmayiz — kok
+   * sayfada onun aktif kalmasi dogru davranis.
+   */
+  var AKTIF_ISARETLERI = ["active", "is-active"];
+
+  function tekAktifNav() {
+    var alt = document.querySelector('[data-mj="bottom-nav"]');
+    if (!alt) return;
+    var ogeler = alt.querySelectorAll('[data-mj="bottom-nav-item"]');
+    if (ogeler.length < 2) return;
+
+    // Kardes kodla ayni normalizasyon: kucuk harf + sondaki egik cizgi yok.
+    // Dil oneki (/tr) SOYULMAZ; href'ler de onu tasidigi icin karsilastirma
+    // tutarli kalir ve en-uzun-eslesme mantigi oneki kendiliginden asar.
+    var yol = (location.pathname || "/").toLowerCase().replace(/\/+$/, "") || "/";
+    var kazanan = null;
+    var enUzun = -1;
+
+    for (var i = 0; i < ogeler.length; i++) {
+      var oge = ogeler[i];
+      var baglanti = oge.tagName === "A" ? oge : oge.querySelector("a");
+      var href = baglanti && baglanti.getAttribute("href");
+      if (!href || href.charAt(0) !== "/") continue;
+      var hedefYol = href.split("?")[0].split("#")[0].toLowerCase().replace(/\/+$/, "") || "/";
+      var eslesir = hedefYol === "/" ? yol === "/" : (yol === hedefYol || yol.indexOf(hedefYol + "/") === 0);
+      if (eslesir && hedefYol.length > enUzun) { enUzun = hedefYol.length; kazanan = oge; }
+    }
+
+    // Hicbir oge eslesmedi: CMS'in kararina karisma.
+    if (!kazanan) return;
+
+    for (var j = 0; j < ogeler.length; j++) {
+      var o = ogeler[j];
+      if (o === kazanan) continue;
+      for (var k = 0; k < AKTIF_ISARETLERI.length; k++) o.classList.remove(AKTIF_ISARETLERI[k]);
+      if (o.getAttribute("aria-current") === "page") o.removeAttribute("aria-current");
+      if (o.getAttribute("aria-selected") === "true") o.setAttribute("aria-selected", "false");
+      if (o.getAttribute("data-active") === "true") o.setAttribute("data-active", "false");
+    }
+  }
+
   function goster() {
     modalGomme();                       // hesap modali acikken icine gom
     kisayolSeridi();                    // mobil ikinci header satiri
+    tekAktifNav();                      // alt navbar'da cift aktif durumu engelle
     var hedef = hedefBul();
     var mevcut = document.getElementById(KAP_ID);
     rotaSinifi(hedef);                  // CSS'in sayfayı tanıması için
