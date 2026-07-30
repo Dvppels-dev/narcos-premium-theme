@@ -668,17 +668,17 @@
     }
     var login = query('[data-mj="login-button"]', right);
     var loginRoot = directChild(login, right);
-    var call = mount("narcos-call-button", "a", right, loginRoot, function (button) {
-      button.className = "ng-call-button";
-      button.href = CALL_REQUEST_PATH;
-      button.setAttribute("aria-label", "Aranma talebi oluştur");
-      button.setAttribute("data-ng-action", "call-request");
-      var icon = makeImage(ASSETS.telephone, "ng-call-icon", "", 24, 24, false);
-      icon.setAttribute("aria-hidden", "true");
-      button.appendChild(icon);
-      button.appendChild(create("span", "ng-call-label", "Beni Ara"));
-    });
-    var telegram = mount("narcos-telegram-button", "a", right, call, function (button) {
+    // Aranma talep ikonu kaldirildi: header'da iki ayri giris vardi — burada
+    // uretilen telefon ikonu ve CMS menusundeki "Aranma Talep" ogesi. Ikisi de
+    // ayni yere gidiyordu; menudeki etiketli oldugu icin daha anlasilir.
+    //
+    // Onceden olusturulmus dugum kalmasin (tarayicida eski surum onbellekte
+    // olabilir ya da kullanici gezinirken DOM'da kalmis olabilir).
+    var eskiCall = document.getElementById("narcos-call-button");
+    if (eskiCall) eskiCall.remove();
+    // Telegram butonu konumunu telefon ikonundan aliyordu; artik login'e gore
+    // yerlesiyor.
+    var telegram = mount("narcos-telegram-button", "a", right, loginRoot, function (button) {
       button.className = "ng-telegram-button";
       button.href = TELEGRAM_URL;
       button.target = "_blank";
@@ -689,7 +689,7 @@
       button.appendChild(icon);
     });
     var giftRoot = directChild(gift, right);
-    if (giftRoot && giftRoot !== loginRoot && giftRoot !== call && giftRoot !== telegram) {
+    if (giftRoot && giftRoot !== loginRoot && giftRoot !== telegram) {
       place(right, giftRoot, telegram);
     }
     observeHeaderState(header);
@@ -1536,112 +1536,21 @@
 })();
 
 /* ================= PANEL GOMME (IFRAME) ================= */
-/*!
- * narcos-panel-gomme.js
+/*
+ * BURADAN KALDIRILDI — tek yetkili uygulama: narcos-panel-gomme.js
  *
- * CMS kategori sayfalarında paneli iframe olarak gömer (yönlendirme YAPMAZ).
- * Lynon'da sayfa başına HTML alanı olmadığı için eşleştirme merkezîdir.
+ * Bu dosya panel gomme IIFE'sinin TAM bir kopyasini tasiyordu: ayni
+ * KAP_ID ("narcos-panel-frame"), ayni hedefBul/goster akisi, ama ESKI bir
+ * HARITA (/narcosturnuva yok) ve modal gomme / yukseklik hesabi olmadan.
  *
- * ÖN KOŞUL: panelin CSP'sinde frame-ancestors bu alan adını içermeli,
- * aksi halde tarayıcı iframe'i boş gösterir.
+ * Iki script ayni DOM dugumu icin yarisiyordu; hangisi sonra kosarsa o
+ * kazaniyordu. Gozlenen sonuclar:
+ *   - header ikonlari iframe yerine siteye yonlendiriyordu
+ *     (eski HARITA yolu tanimayinca hedefBul() null donuyor, goster()
+ *      kabi soküyor ve CMS'in kendi gezinmesi devrede kaliyordu)
+ *   - sayfa yenilendiginde panel iframe degil dogrudan site olarak aciliyordu
+ *     (yenilemede kopya once kosup kabi temizliyordu)
+ *
+ * Gomme mantigi degistirilecekse narcos-panel-gomme.js duzenlenmeli;
+ * buraya geri kopyalanmamali.
  */
-(function () {
-  "use strict";
-
-  var HARITA = {
-    "/bonusrequest": "https://narcosbahis.vip/#/bonus-talep",
-    "/narcoscark":   "https://narcosbahis.vip/#/cark",
-    "/aranmatalep":  "https://narcosbahis.vip/#/beni-ara",
-    "/narcosskor":   "https://narcosbahis.vip/#/skor-tahmin"
-  };
-  var KAP_ID = "narcos-panel-frame";
-
-  function hedefBul() {
-    var yol = (location.pathname || "/").toLowerCase().replace(/\/+$/, "");
-    var dilsiz = yol.replace(/^\/[a-z]{2}(?=\/)/, "");
-    return HARITA[dilsiz] || HARITA[yol] || null;
-  }
-
-  function icerikAlani() {
-    return document.querySelector('main[data-mj="page-content"]') ||
-           document.querySelector("main") ||
-           document.getElementById("root");
-  }
-
-  function goster() {
-    var hedef = hedefBul();
-    var mevcut = document.getElementById(KAP_ID);
-
-    if (!hedef) {                       // eşleşmeyen sayfada kalıntı bırakma
-      if (mevcut) {
-        var ust = mevcut.parentElement;
-        mevcut.remove();
-        if (ust) {                      // gizlediğimiz içeriği geri aç
-          var gizli = ust.querySelectorAll("[data-ng-gizli]");
-          for (var j = 0; j < gizli.length; j++) {
-            gizli[j].style.display = gizli[j].getAttribute("data-ng-gizli") || "";
-            gizli[j].removeAttribute("data-ng-gizli");
-          }
-        }
-      }
-      return;
-    }
-    if (mevcut) {                       // zaten var; hedef değiştiyse güncelle
-      var f = mevcut.querySelector("iframe");
-      if (f && f.src !== hedef) f.src = hedef;
-      return;
-    }
-
-    var yer = icerikAlani();
-    if (!yer) return;                   // henüz render olmadı, gözlemci tekrar dener
-
-    // React'in yönettiği düğümleri SİLMEYİZ. innerHTML="" kullanılırsa React
-    // kendi çocuklarını bulamayıp "removeChild: node is not a child" ile
-    // çöküyor. Bunun yerine mevcut içerik CSS ile gizlenir, iframe eklenir.
-    for (var i = 0; i < yer.children.length; i++) {
-      var c = yer.children[i];
-      if (c.id !== KAP_ID) {
-        if (!c.hasAttribute("data-ng-gizli")) {
-          c.setAttribute("data-ng-gizli", c.style.display || "");
-        }
-        c.style.display = "none";
-      }
-    }
-
-    var kap = document.createElement("div");
-    kap.id = KAP_ID;
-    kap.style.cssText =
-      "width:100%;min-height:min(760px,82vh);overflow:hidden;" +
-      "border-radius:16px;background:#09090b;margin:0 auto;";
-
-    var ifr = document.createElement("iframe");
-    ifr.src = hedef;
-    ifr.setAttribute("loading", "lazy");
-    ifr.setAttribute("title", "Narcos Panel");
-    ifr.setAttribute("allow", "clipboard-write");
-    ifr.style.cssText =
-      "display:block;width:100%;height:100%;min-height:inherit;border:0;";
-    kap.appendChild(ifr);
-
-    yer.appendChild(kap);
-  }
-
-  function planla() { setTimeout(goster, 0); }
-
-  planla();
-
-  ["pushState", "replaceState"].forEach(function (ad) {
-    var orj = history[ad];
-    if (typeof orj !== "function") return;
-    history[ad] = function () { var r = orj.apply(this, arguments); planla(); return r; };
-  });
-  window.addEventListener("popstate", planla);
-
-  // SPA içeriği geç render ederse kabı yeniden yerleştir
-  if (typeof MutationObserver === "function" && document.body) {
-    var gozlemci = new MutationObserver(function () {
-      if (hedefBul() && !document.getElementById(KAP_ID)) goster();
-    });
-    gozlemci.observe(document.body, { childList: true, subtree: true });
-  }
-})();
