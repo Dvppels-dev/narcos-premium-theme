@@ -1699,3 +1699,72 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
     height: 82dvh;
   }
 }
+
+/* --- 9. Mobil kisayol seridi (header'in ikinci satiri) -------------
+ * narcos-panel-gomme.js header'in hemen altina ekler. Yalnizca mobilde
+ * gorunur: masaustunde ust menu zaten bu sayfalari tasiyor, ikinci satir
+ * orada tekrar olurdu.
+ */
+#narcos-mobil-kisayol {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  #narcos-mobil-kisayol {
+    position: sticky;
+    top: 0;
+    z-index: 29;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(243, 236, 221, 0.08);
+    background: rgba(14, 12, 9, 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  #narcos-mobil-kisayol a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    /* 44px dokunma hedefi: bunun altinda parmakla isabet dusuyor. */
+    min-height: 44px;
+    padding: 4px 2px;
+    border-radius: 10px;
+    color: #8f8674;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color .15s ease, color .15s ease;
+  }
+
+  #narcos-mobil-kisayol a svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+  }
+
+  #narcos-mobil-kisayol a:hover {
+    color: #f3ecdd;
+    background: rgba(243, 236, 221, 0.05);
+  }
+
+  /* Bulundugun sayfa: altin dolgu + koyu metin — lobi navigasyonuyla ayni dil. */
+  #narcos-mobil-kisayol a[data-ng-aktif] {
+    color: #171204;
+    background: linear-gradient(120deg, #eed9a3, #d3a952);
+  }
+
+  /* Bakiye, para yatir ve profil sag ust kosede kalsin; satir daralinca
+   * sarmalanip logonun altina dusuyorlardi. */
+  [data-mj="header-right"] {
+    margin-left: auto !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+  }
+}

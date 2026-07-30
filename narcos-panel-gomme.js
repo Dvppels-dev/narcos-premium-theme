@@ -19,7 +19,9 @@
     "/narcoscark":   "https://narcosbahis.vip/#/cark",
     "/tacowheel":    "https://narcosbahis.vip/#/cark",
     "/aranmatalep":  "https://narcosbahis.vip/#/beni-ara",
-    "/narcosskor":   "https://narcosbahis.vip/#/skor-tahmin"
+    "/narcosskor":   "https://narcosbahis.vip/#/skor-tahmin",
+    // Turnuva CMS sayfasi yeni; panelde gunluk turnuva acilis ekrani.
+    "/narcosturnuva": "https://narcosbahis.vip/#/turnuva/gunluk"
   };
   var KAP_ID = "narcos-panel-frame";
   var PANEL_ORIGIN = "https://narcosbahis.vip";
@@ -306,6 +308,55 @@
       "max(" + TABAN_YUKSEKLIK + "px, calc(100dvh - " + (ust + alt) + "px))";
   }
 
+  /* ---------- Mobil kisayol seridi ----------
+   *
+   * Mobilde header tek satir: solda logo, sagda butonlar. Panel sayfalarina
+   * (bonus, cark, skor, turnuva, aranma) gitmek icin burger menuyu acmak
+   * gerekiyordu. Header'in altina ikinci bir satir ekliyoruz.
+   *
+   * Rotalar HARITA ile ayni kaynaktan beslenmiyor cunku burada SIRA ve
+   * ETIKET de var; ama yollar birebir HARITA anahtarlariyla eslesiyor, yani
+   * bir rota eklenirse iki yerde de gorunmeli.
+   */
+  var KISAYOL_ID = "narcos-mobil-kisayol";
+  var KISAYOLLAR = [
+    { yol: "/aranmatalep",   etiket: "Aranma",  ikon: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" },
+    { yol: "/bonusrequest",  etiket: "Bonus",   ikon: "M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" },
+    { yol: "/narcosskor",    etiket: "Skor",    ikon: "M12 13V2l8 4-8 4M20.55 10.23A9 9 0 1 1 8 4.94M8 10a5 5 0 1 0 8.9 2.02" },
+    { yol: "/narcoscark",    etiket: "Çark",    ikon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM12 2v7.5M19 17l-5.2-3.7M5 17l5.2-3.7" },
+    { yol: "/narcosturnuva", etiket: "Turnuva", ikon: "M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2z" }
+  ];
+
+  function kisayolSeridi() {
+    if (document.getElementById(KISAYOL_ID)) return;
+
+    var header = document.querySelector('[data-mj="custom-header"]')
+              || document.querySelector('[data-mj="header"]');
+    if (!header || !header.parentElement) return;
+
+    var yol = (location.pathname || "/").toLowerCase().replace(/\/+$/, "");
+    var dilsiz = yol.replace(/^\/[a-z]{2}(?=\/)/, "");
+
+    var nav = document.createElement("nav");
+    nav.id = KISAYOL_ID;
+    nav.setAttribute("data-ng-mobil-kisayol", "");
+    nav.setAttribute("aria-label", "Hızlı erişim");
+
+    var html = "";
+    for (var i = 0; i < KISAYOLLAR.length; i++) {
+      var k = KISAYOLLAR[i];
+      var aktif = dilsiz === k.yol ? ' data-ng-aktif=""' : "";
+      html +=
+        '<a href="/tr' + k.yol + '"' + aktif + '>' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+          'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + k.ikon + '"/></svg>' +
+          '<span>' + k.etiket + '</span>' +
+        '</a>';
+    }
+    nav.innerHTML = html;
+    header.parentElement.insertBefore(nav, header.nextSibling);
+  }
+
   function icerikAlani() {
     return document.querySelector('main[data-mj="page-content"]') ||
            document.querySelector("main") ||
@@ -339,6 +390,7 @@
 
   function goster() {
     modalGomme();                       // hesap modali acikken icine gom
+    kisayolSeridi();                    // mobil ikinci header satiri
     var hedef = hedefBul();
     var mevcut = document.getElementById(KAP_ID);
     rotaSinifi(hedef);                  // CSS'in sayfayı tanıması için
