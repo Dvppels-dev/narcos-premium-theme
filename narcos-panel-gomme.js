@@ -108,35 +108,97 @@
   }
 
   /**
-   * Sitenin kendi hesap modallarını panele yönlendiren sorgu eşlemesi.
+   * Hesap panelindeki sekmeler: modali KAPATMIYORUZ, icine gomuyoruz.
    *
-   * "?m=account&t=bonus_offers" sitenin hesap menüsündeki bonus teklifleri
-   * modalini açıyor. Bu modal panelin bonus talep ekranının üstüne binerek onu
-   * gizliyordu. Parametreleri temizleyip yolu bonus sayfasına çekiyoruz; modal
-   * kapanıyor, geriye iframe kalıyor.
+   * Onceki surum sorgu parametrelerini dusurup modali kapatiyordu. Iki sorunu
+   * vardi: (1) oyuncu profilden cikmis oluyordu, (2) modal yolun kendisiyle
+   * aciliyorsa (sorgu yokken) hic devreye girmiyordu — kullanicinin
+   * /tr/bonusrequest ekran goruntusundeki durum buydu.
+   *
+   * TacoBahis custom.js'teki calisan yaklasim ornek alindi: modal acik kalir,
+   * sitenin kendi icerigi CSS ile gizlenir, yerine panel iframe'i konur.
    */
-  var MODAL_ESLEME = [
-    { m: "account", t: "bonus_offers", yol: "/tr/bonusrequest" },
-    // Anlık iade modali da aynı sayfayı kaplıyor; hesap menüsünde bonus
-    // tekliflerinin hemen yanında duruyor ve oyuncular ikisini de kullanıyor.
-    { m: "account", t: "instant_cashback", yol: "/tr/bonusrequest" }
-  ];
+  var MODAL_SEKMELERI = ["bonus_offers", "instant_cashback"];
+  var MODAL_HEDEF = "https://narcosbahis.vip/#/bonus-talep";
+  var MODAL_KAP = "narcos-modal-frame";
 
-  function modalYonlendir() {
-    var p = new URLSearchParams(location.search);
-    var m = (p.get("m") || "").toLowerCase();
-    var t = (p.get("t") || "").toLowerCase();
-    if (!m && !t) return false;
+  /**
+   * Modal govdesini YAPISAL olarak bulur.
+   *
+   * Hash'li sinif adina (app-ltr-*) veya "Bonus Talep Et" metnine
+   * baglanmiyoruz: sinif her derlemede, metin dil degisiminde degisir.
+   *
+   * Masaustu: modal >=2 cocuk (sol menu + sag panel); govde = sag panelin
+   * son cocugu (ilki baslik seridi).
+   * Mobil: modal TEK cocuk (kabuk); govde = kabugun son cocugu.
+   */
+  function modalGovdesiBul() {
+    var modal = document.querySelector(".modal");
+    if (!modal) return null;
 
-    for (var i = 0; i < MODAL_ESLEME.length; i++) {
-      var e = MODAL_ESLEME[i];
-      if (m !== e.m || t !== e.t) continue;
-      // Yalnızca sorgu parametrelerini düşür; geri tuşunda modale dönülmesin
-      // diye replaceState kullanılır (yeni geçmiş kaydı oluşturmaz).
-      history.replaceState(history.state, "", e.yol);
-      return true;
+    if (modal.children.length >= 2) {
+      var sag = modal.children[modal.children.length - 1];
+      if (sag && sag.children.length >= 2) return sag.children[sag.children.length - 1];
+      return null;
     }
-    return false;
+    if (modal.children.length === 1) {
+      var kabuk = modal.children[0];
+      if (kabuk && kabuk.children.length >= 2) return kabuk.children[kabuk.children.length - 1];
+    }
+    return null;
+  }
+
+  function modalSekmesi() {
+    var t = (new URLSearchParams(location.search).get("t") || "").toLowerCase();
+    return MODAL_SEKMELERI.indexOf(t) !== -1 ? t : null;
+  }
+
+  /**
+   * Modal icine paneli gomer.
+   *
+   * TEMIZLIK SART: baska sekmeye gecilince React AYNI govde dugumunu yeniden
+   * kullaniyor. Isaret kaldirilmazsa o sekmenin kendi icerigi de gizli kalir.
+   */
+  function modalGomme() {
+    var mevcut = document.querySelector("[data-ng-modal-embed]");
+    var sekme = modalSekmesi();
+
+    if (!sekme) {
+      if (mevcut) mevcut.remove();
+      var eski = document.querySelector("[data-ng-modal-host]");
+      if (eski) eski.removeAttribute("data-ng-modal-host");
+      return;
+    }
+
+    var govde = modalGovdesiBul();
+    if (!govde) return;
+
+    if (!govde.hasAttribute("data-ng-modal-host")) {
+      govde.setAttribute("data-ng-modal-host", "");
+    }
+    if (mevcut) {
+      kimligiYolla(mevcut.querySelector("iframe"));
+      return;
+    }
+
+    var kap = document.createElement("div");
+    kap.className = "ng-modal-embed";
+    kap.id = MODAL_KAP;
+    kap.setAttribute("data-ng-modal-embed", sekme);
+
+    var ifr = document.createElement("iframe");
+    ifr.src = MODAL_HEDEF;
+    ifr.title = "Narcos Panel";
+    ifr.setAttribute("allow", "clipboard-write");
+    // Footer script'inin oyun karesi tespitine yakalanmamak icin.
+    ifr.setAttribute("data-ng-panel", "1");
+    ifr.setAttribute("loading", "eager");
+
+    kap.appendChild(ifr);
+    govde.appendChild(kap);
+
+    ifr.addEventListener("load", function () { kimligiYolla(ifr); });
+    kullaniciyiGetir().then(function () { kimligiYolla(ifr); });
   }
 
   function hedefBul() {
@@ -276,7 +338,7 @@
   }
 
   function goster() {
-    modalYonlendir();                   // sorgu tabanlı modalleri panele çevir
+    modalGomme();                       // hesap modali acikken icine gom
     var hedef = hedefBul();
     var mevcut = document.getElementById(KAP_ID);
     rotaSinifi(hedef);                  // CSS'in sayfayı tanıması için

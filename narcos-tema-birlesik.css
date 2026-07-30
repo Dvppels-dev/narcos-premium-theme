@@ -1657,3 +1657,45 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
     display: none !important;
   }
 }
+
+/* --- 8. Hesap modali icine gomulen panel --------------------------
+ * narcos-panel-gomme.js modal govdesini [data-ng-modal-host] ile isaretler.
+ * Modal KAPATILMAZ: oyuncu profilden cikmis olmaz, sitenin sekme yapisi
+ * korunur. Govdenin kendi icerigi gizlenip yerine panel iframe'i gelir.
+ *
+ * Yalnizca iframe kabimizi disarida birakiyoruz; React'in yonettigi dugumleri
+ * SILMIYORUZ (innerHTML temizligi "removeChild: node is not a child" ile
+ * cokerdi) — gizlemek yeterli.
+ */
+[data-ng-modal-host] > *:not(.ng-modal-embed) {
+  display: none !important;
+}
+
+[data-ng-modal-host] {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.ng-modal-embed {
+  display: block;
+  width: 100%;
+  /* Modal govdesi yuksekligini icerikten aliyor; iframe'e somut bir yukseklik
+   * vermezsek 0 piksele cokuyor. Modal ekrandan tasmasin diye dvh tabanli. */
+  height: min(680px, 78dvh);
+  background: #0e0c09;
+}
+
+.ng-modal-embed iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@media (max-width: 620px) {
+  /* Mobilde modal zaten tam ekrana yakin; sabit yukseklik ikinci bir
+   * kaydirma alani yaratiyordu. */
+  .ng-modal-embed {
+    height: 82dvh;
+  }
+}
