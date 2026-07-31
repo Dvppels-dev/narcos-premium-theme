@@ -1767,9 +1767,14 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
 }
 
 /* --- 9. Mobil kisayol seridi (header'in ikinci satiri) -------------
- * narcos-panel-gomme.js header'in hemen altina ekler. Yalnizca mobilde
- * gorunur: masaustunde ust menu zaten bu sayfalari tasiyor, ikinci satir
- * orada tekrar olurdu.
+ * narcos-panel-gomme.js seridi HEADER'IN DOGRUDAN COCUGU olarak ekler.
+ * Header `flex-direction: column` oldugu icin serit dorduncu satir olur ve
+ * header yuksekligi onu kapsar — sayfa icerigi de bu yuksekligin altindan
+ * baslar. Kardes olarak eklendiginde sabit yukseklikli ara satirdan tasip
+ * icerigi ortuyordu.
+ *
+ * Yalnizca mobilde gorunur: masaustunde ust menu zaten bu sayfalari
+ * tasiyor, ikinci satir orada tekrar olurdu.
  */
 #narcos-mobil-kisayol {
   display: none;
@@ -1787,7 +1792,14 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 2px;
+    /* Header bir sutun flex; serit satirin tamamini kaplasin ve
+     * daralmasin. flex-shrink: 0 olmazsa header yuksekligi sabitken
+     * serit eziliyor. */
+    width: 100%;
+    flex: 0 0 auto;
+    box-sizing: border-box;
     padding: 6px 8px;
+    border-top: 1px solid rgba(243, 236, 221, 0.06);
     border-bottom: 1px solid rgba(243, 236, 221, 0.08);
     background: rgba(14, 12, 9, 0.94);
     backdrop-filter: blur(18px);
@@ -1813,10 +1825,20 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
     transition: background-color .15s ease, color .15s ease;
   }
 
+  /* IKON RENGI ogeye ozel.
+   *
+   * Bes ikon ayni altin tonundayken hangisinin ne oldugu ancak yazisi
+   * okunarak anlasiliyordu. Renk, ikonu taniyan kullanicinin yaziyi
+   * okumadan secmesini sagliyor. Deger JS'ten geliyor
+   * (--ng-kisayol-renk); yedegi altin.
+   *
+   * Yalnizca IKON renkleniyor, yazi notr kaliyor: bes farkli renkte metin
+   * seridi okunmaz hale getirirdi. */
   #narcos-mobil-kisayol a svg {
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
+    color: var(--ng-kisayol-renk, #e7c574);
   }
 
   #narcos-mobil-kisayol a:hover {
@@ -1824,10 +1846,25 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
     background: rgba(243, 236, 221, 0.05);
   }
 
-  /* Bulundugun sayfa: altin dolgu + koyu metin — lobi navigasyonuyla ayni dil. */
+  /* Bulundugun sayfa: ogenin KENDI rengiyle vurgulanir.
+   *
+   * Onceden hepsi altin dolgu aliyordu; aktif oge ile Bonus ogesi ayni
+   * gorunuyordu. Artik dolgu ogenin renginden turetiliyor. */
   #narcos-mobil-kisayol a[data-ng-aktif] {
-    color: #171204;
-    background: linear-gradient(120deg, #eed9a3, #d3a952);
+    color: var(--ng-kisayol-renk, #e7c574);
+    background: color-mix(in srgb, var(--ng-kisayol-renk, #e7c574) 16%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ng-kisayol-renk, #e7c574) 34%, transparent);
+  }
+
+  /* color-mix desteklemeyen tarayicida aktif oge yine belli olsun. */
+  @supports not (background: color-mix(in srgb, red 10%, transparent)) {
+    #narcos-mobil-kisayol a[data-ng-aktif] {
+      background: rgba(243, 236, 221, 0.09);
+    }
+  }
+
+  #narcos-mobil-kisayol a[data-ng-aktif] svg {
+    color: var(--ng-kisayol-renk, #e7c574);
   }
 
   /* Bakiye, para yatir ve profil sag ust kosede kalsin; satir daralinca

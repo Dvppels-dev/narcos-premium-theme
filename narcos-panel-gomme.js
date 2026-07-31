@@ -319,20 +319,51 @@
    * bir rota eklenirse iki yerde de gorunmeli.
    */
   var KISAYOL_ID = "narcos-mobil-kisayol";
+  /**
+   * Kisayollar.
+   *
+   * Her ogenin kendi rengi var: bes ikon ayni altin tonundayken hangisinin
+   * ne oldugu ancak yazisi okunarak anlasiliyordu. Renk, ikonu taniyan
+   * kullanicinin yaziyi okumadan secmesini sagliyor.
+   *
+   * Renkler CSS degiskeni olarak veriliyor (--ng-kisayol-renk); aktif/hover
+   * durumlarini CSS yonetiyor.
+   */
   var KISAYOLLAR = [
-    { yol: "/aranmatalep",   etiket: "Aranma",  ikon: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" },
-    { yol: "/bonusrequest",  etiket: "Bonus",   ikon: "M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" },
-    { yol: "/narcosskor",    etiket: "Skor",    ikon: "M12 13V2l8 4-8 4M20.55 10.23A9 9 0 1 1 8 4.94M8 10a5 5 0 1 0 8.9 2.02" },
-    { yol: "/narcoscark",    etiket: "Çark",    ikon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM12 2v7.5M19 17l-5.2-3.7M5 17l5.2-3.7" },
-    { yol: "/narcosturnuva", etiket: "Turnuva", ikon: "M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2z" }
+    { yol: "/aranmatalep",   etiket: "Aranma",  renk: "#5fd6a7",
+      ikon: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" },
+    { yol: "/bonusrequest",  etiket: "Bonus",   renk: "#e7c574",
+      ikon: "M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" },
+    { yol: "/narcosskor",    etiket: "Skor",    renk: "#6ab7ff",
+      ikon: "M12 13V2l8 4-8 4M20.55 10.23A9 9 0 1 1 8 4.94M8 10a5 5 0 1 0 8.9 2.02" },
+    // Cark ikonu degistirildi: onceki cizim bir tekerlek degil, ortasi
+    // delik bir daireye benziyordu. Bu sekil dilimli bir carki gosteriyor —
+    // dis cember + merkezden cikan alti dilim cizgisi + gobek.
+    { yol: "/narcoscark",    etiket: "Çark",    renk: "#f0883e",
+      ikon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 2v10M12 12l8.66-5M12 12l8.66 5M12 12v10M12 12L3.34 17M12 12L3.34 7M12 10.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" },
+    { yol: "/narcosturnuva", etiket: "Turnuva", renk: "#d9a3ff",
+      ikon: "M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2z" }
   ];
 
   function kisayolSeridi() {
     if (document.getElementById(KISAYOL_ID)) return;
 
-    var header = document.querySelector('[data-mj="custom-header"]')
-              || document.querySelector('[data-mj="header"]');
-    if (!header || !header.parentElement) return;
+    /**
+     * Serit HEADER'IN DOGRUDAN COCUGU olmali.
+     *
+     * Onceden custom-header'in yanina (kardes olarak) ekleniyordu. O dugumun
+     * ebeveyni SABIT yukseklikte (60px) bir satir; serit oradan tasip
+     * header'in kutusunun disina cikiyordu. Header 93px'te bitiyor, serit
+     * 149'a uzaniyordu — sayfa icerigi 93'ten basladigi icin serit onu tam
+     * 56px ortuyordu. Bildirilen "sayfalarin ustune geliyor" buydu.
+     *
+     * Header `flex-direction: column`; dogrudan cocuk olarak eklenince
+     * dorduncu satir oluyor ve header yuksekligi (92 -> 150) onu KAPSIYOR.
+     * Icerik de bu yeni yuksekligin altindan basliyor.
+     */
+    var header = document.querySelector('[data-mj="header"]')
+              || document.querySelector('[data-mj="custom-header"]');
+    if (!header) return;
 
     var yol = (location.pathname || "/").toLowerCase().replace(/\/+$/, "");
     var dilsiz = yol.replace(/^\/[a-z]{2}(?=\/)/, "");
@@ -347,14 +378,14 @@
       var k = KISAYOLLAR[i];
       var aktif = dilsiz === k.yol ? ' data-ng-aktif=""' : "";
       html +=
-        '<a href="/tr' + k.yol + '"' + aktif + '>' +
+        '<a href="/tr' + k.yol + '"' + aktif + ' style="--ng-kisayol-renk:' + k.renk + '">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
           'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + k.ikon + '"/></svg>' +
           '<span>' + k.etiket + '</span>' +
         '</a>';
     }
     nav.innerHTML = html;
-    header.parentElement.insertBefore(nav, header.nextSibling);
+    header.appendChild(nav);
   }
 
   function icerikAlani() {
