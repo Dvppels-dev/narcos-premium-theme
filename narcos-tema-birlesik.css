@@ -1740,6 +1740,32 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
   }
 }
 
+/* --- 8b. "Ligler" seridi (widget-collection-slider) ----------------
+ *
+ * Mobilde her kart 320x156 idi: 375px ekranin %85'i. Ekranda tek lig
+ * goruyordunuz, kaydirmadan ikincisinin varligi bile belli olmuyordu ve
+ * serit 204px dikey alan yiyordu.
+ *
+ * 158px genislik ~2,2 kart gosteriyor — yanindakinin bir kismi gorunuyor,
+ * kaydirilabilir oldugu anlasiliyor. Yukseklik gorselin en-boy oranindan
+ * turetiliyor, sabit deger verilmiyor: farkli oranli lig gorselleri
+ * kirpilmasin.
+ */
+@media (max-width: 767px) {
+  [data-mj="widget-collection-slider-item"] {
+    flex: 0 0 auto !important;
+    width: 158px !important;
+    min-width: 158px !important;
+    max-width: 158px !important;
+  }
+
+  [data-mj="widget-collection-slider-item"] img {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 2.05 / 1 !important;
+  }
+}
+
 /* --- 9. Mobil kisayol seridi (header'in ikinci satiri) -------------
  * narcos-panel-gomme.js header'in hemen altina ekler. Yalnizca mobilde
  * gorunur: masaustunde ust menu zaten bu sayfalari tasiyor, ikinci satir
