@@ -179,18 +179,21 @@ main [role="textbox"]:focus {
   border-bottom: 1px solid rgba(242, 213, 138, .34) !important;
   box-shadow: 0 12px 34px rgba(0, 0, 0, .3) !important;
   /* Header kendi yigin baglamini kursun.
+   *
    * Onceden z-index yoktu: sayfa icindeki yuksek z-index'li ogeler (slider
-   * oklari, modal tetikleyicileri) header'in ustune ciKiyor ya da tam tersi
-   * header icerigi ortuyordu — hangisinin kazandigi DOM sirasina kaliyordu. */
-  position: relative !important;
-  z-index: 40 !important;
+   * oklari, modal tetikleyicileri) header'in ustune cikiyor ya da tam tersi
+   * header icerigi ortuyordu — hangisinin kazandigi DOM sirasina kaliyordu.
+   *
+   * `position: relative !important` KULLANILMIYOR: sitenin kendi header
+   * konumlandirmasini (sticky/fixed) eziyordu. isolation: isolate statik
+   * ogede de yigin baglami kuruyor ve yerlesime dokunmuyor. */
+  isolation: isolate;
 }
 
-/* Sayfa icerigi header'in ALTINDA kalsin; kendi yigininda yuksek deger
- * kullanan bilesenler header'i asamasin. */
+/* Sayfa icerigi kendi yigin baglaminda kalsin; icindeki yuksek z-index'li
+ * bilesenler header'in yigini icine sizmasin. */
 [data-mj="page-content"] {
-  position: relative;
-  z-index: 1;
+  isolation: isolate;
 }
 [data-mj="custom-header"],
 [aria-label="site-header"],
@@ -1748,10 +1751,13 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
 
 @media (max-width: 767px) {
   #narcos-mobil-kisayol {
-    position: sticky;
-    top: 0;
-    /* Header 40; serit onun altinda kalmali, ustune binmemeli. */
-    z-index: 30;
+    /* STICKY DEGIL — bilerek.
+     *
+     * Onceden `position: sticky; top: 0` idi ve opak arka planiyla
+     * kaydirildikca sayfa icerigini ortuyordu. Sitenin zaten kalici bir alt
+     * navigasyonu var; 375px'te ikinci bir yapiskan bant hem dikey alan
+     * yiyor hem de icerigi kapatiyordu. Serit header'la birlikte kayiyor. */
+    position: relative;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 2px;
