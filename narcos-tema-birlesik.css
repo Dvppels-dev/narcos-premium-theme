@@ -997,13 +997,34 @@ footer::before,
   }
   [data-mj="header-nav-list"] > ul { display: flex !important; width: 100% !important; }
   [data-mj="header-nav-item"] { flex: 1 1 auto !important; min-width: 0 !important; }
-  [data-mj="header-nav-item"] > a { gap: clamp(5px, .55vw, 10px) !important; padding-inline: clamp(7px, .85vw, 15px) !important; }
-  [data-mj="header-nav-item"] p { font-size: clamp(12px, .92vw, 16px) !important; white-space: nowrap !important; }
-  /* İkona sabit boyut verilmiyordu: platformun kendi varsayılan SVG/IMG
-   * boyutu 11 menü öğesiyle dar ekranlarda metnin üstüne taşıp ikon ve
-   * yazının iç içe girmiş gibi görünmesine yol açıyordu. Boyut artık
-   * gold-glass temasındakiyle birebir aynı, sabit bir üst/alt sınıra
-   * (clamp) bağlı — metinle asla çakışmıyor. */
+  [data-mj="header-nav-item"] > a {
+    gap: clamp(5px, .55vw, 10px) !important;
+    padding-inline: clamp(7px, .85vw, 15px) !important;
+    /* Guvenlik agi: %100 disi Windows olcegi (125%/150%) Chromium'da
+     * alt-piksel yuvarlamasina yol aciyor ve zaten dar olan bosluk
+     * eriyip ikonla yazi cakisiyormus gibi gorunuyordu — sayisal
+     * degerler dogru olsa bile. `overflow: hidden` bu durumda metni
+     * TASIRMAK yerine KIRPAR; cakismak yerine "..." gorunur. */
+    overflow: hidden !important;
+  }
+  [data-mj="header-nav-item"] p {
+    font-size: clamp(12px, .92vw, 16px) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
+  }
+  /* İkon gercekte <img>/<svg> DEGIL, mask-image ile boyanan bir <span>.
+   * Bu span'a sabit boyut verilmiyordu; ustteki `img, svg` kurali hicbir
+   * zaman eslesmiyordu (asagida hala duruyor, baska bir surumde
+   * <img>/<svg> kullanilirsa diye zararsiz). Asil ikonu simdi acikca
+   * hedefliyoruz ve `flex-shrink: 0` ile metin dar alanda onu asla
+   * sikistiramaz hale getiriyoruz. */
+  [data-mj="header-nav-item"] > a > span:first-child {
+    width: clamp(18px, 1.45vw, 25px) !important;
+    height: clamp(18px, 1.45vw, 25px) !important;
+    flex-shrink: 0 !important;
+  }
   [data-mj="header-nav-item"] img,
   [data-mj="header-nav-item"] svg {
     width: clamp(18px, 1.45vw, 25px) !important;
