@@ -999,6 +999,17 @@ footer::before,
   [data-mj="header-nav-item"] { flex: 1 1 auto !important; min-width: 0 !important; }
   [data-mj="header-nav-item"] > a { gap: clamp(5px, .55vw, 10px) !important; padding-inline: clamp(7px, .85vw, 15px) !important; }
   [data-mj="header-nav-item"] p { font-size: clamp(12px, .92vw, 16px) !important; white-space: nowrap !important; }
+  /* İkona sabit boyut verilmiyordu: platformun kendi varsayılan SVG/IMG
+   * boyutu 11 menü öğesiyle dar ekranlarda metnin üstüne taşıp ikon ve
+   * yazının iç içe girmiş gibi görünmesine yol açıyordu. Boyut artık
+   * gold-glass temasındakiyle birebir aynı, sabit bir üst/alt sınıra
+   * (clamp) bağlı — metinle asla çakışmıyor. */
+  [data-mj="header-nav-item"] img,
+  [data-mj="header-nav-item"] svg {
+    width: clamp(18px, 1.45vw, 25px) !important;
+    height: clamp(18px, 1.45vw, 25px) !important;
+    flex-shrink: 0 !important;
+  }
 }
 /* ---------------- TABLET ---------------- */
 @media (max-width: 920px) {
