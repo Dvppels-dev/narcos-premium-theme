@@ -1300,7 +1300,10 @@ footer::before,
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
-    aspect-ratio: 16 / 7 !important;
+    /* Banner gorselleri 882x392 = 9/4 (2.25). Kutu 16/7 (2.2857) idi:
+     * `object-fit: contain` gorseli yukseklige sigdirip iki yanda ~2.75px
+     * siyah bant birakiyordu. Oran gorselle birebir olunca bant kalmiyor. */
+    aspect-ratio: 9 / 4 !important;
     border-radius: 16px !important;
   }
   [data-mj="widget-multi-banner-slider"] > * { flex: 0 0 100% !important; width: 100% !important; height: 100% !important; }
@@ -1832,7 +1835,9 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
   [data-mj="widget-collection-slider-item"] img {
     width: 100% !important;
     height: auto !important;
-    aspect-ratio: 2.05 / 1 !important;
+    /* Masaustu kuraliyla ayni olsun: gorseller 592x288 (2.0556).
+     * 2.05/1 yuvarlamasi cover ile ustten/alttan tirasliyordu. */
+    aspect-ratio: 592 / 288 !important;
   }
 }
 
