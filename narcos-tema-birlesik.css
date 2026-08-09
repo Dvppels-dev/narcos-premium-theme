@@ -986,6 +986,10 @@ footer::before,
     padding-inline: clamp(18px, 4.5vw, 94px) !important;
     box-sizing: border-box !important;
   }
+  /* Nav seridi ust satirla ayni 4.5vw yan boslugu kullaniyordu; 1920px'te
+   * bu tek basina 173px yiyor ve 12 menu ogesi icin yer kalmiyordu.
+   * Serit, logo/buton satirindan daha dar bir yan bosluk kullansin. */
+  [data-mj="header-nav-list"] { padding-inline: clamp(10px, 1.4vw, 40px) !important; }
   [aria-label="site-header"] { display: flex !important; align-items: center !important; }
   [data-mj="header-left"] { order: 1; flex: 0 0 auto !important; max-width: 245px !important; }
   [data-mj="header-center"] { order: 2; flex: 1 1 auto !important; min-width: 0 !important; }
@@ -996,40 +1000,74 @@ footer::before,
     margin-left: clamp(6px, .6vw, 12px) !important;
   }
   [data-mj="header-nav-list"] > ul { display: flex !important; width: 100% !important; }
-  [data-mj="header-nav-item"] { flex: 1 1 auto !important; min-width: 0 !important; }
-  [data-mj="header-nav-item"] > a {
-    gap: clamp(5px, .55vw, 10px) !important;
-    padding-inline: clamp(7px, .85vw, 15px) !important;
-    /* Guvenlik agi: %100 disi Windows olcegi (125%/150%) Chromium'da
-     * alt-piksel yuvarlamasina yol aciyor ve zaten dar olan bosluk
-     * eriyip ikonla yazi cakisiyormus gibi gorunuyordu — sayisal
-     * degerler dogru olsa bile. `overflow: hidden` bu durumda metni
-     * TASIRMAK yerine KIRPAR; cakismak yerine "..." gorunur. */
+  [data-mj="header-nav-item"] { flex: 1 1 auto !important; min-width: 0 !important; padding-right: 0 !important; }
+  /* ASIL HATA BURADAYDI: <li> `flex: 1 1 auto` ile iceriginin altina
+   * kadar kuculebiliyor, ama icindeki <a> hicbir genislik kisitina
+   * bagli degildi — kendi dogal genisliginde kalip <li>'sini SAGA
+   * DOGRU TASIYORDU. Tasan <a>, komsu ogenin ikonunun uzerine biniyor
+   * ve "ikon yazinin ustune binmis" gorunumu olusuyordu. Onceki
+   * `overflow: hidden` guvenlik agi ise ise yaramiyordu: tasan kutu
+   * <a>'nin KENDISI, icerigi degildi.
+   * Cozum: <a> her kosulda <li>'sinin genisligine kilitli. */
+  [data-mj="header-nav-item"] > a,
+  [data-mj="header-nav-item"] > button,
+  [data-mj="header-nav-item"] > span,
+  [data-mj="header-nav-item"] > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    gap: clamp(3px, .35vw, 5px) !important;
+    padding-inline: clamp(4px, .5vw, 8px) !important;
     overflow: hidden !important;
   }
+  /* Ust sinirlar 1440px'te sabitleniyor: kapsayici 1400px'te duruyor ama
+   * vw'ye bagli deger buyumeye devam edince genis ekranda yazi tasiyordu. */
   [data-mj="header-nav-item"] p {
-    font-size: clamp(12px, .92vw, 16px) !important;
+    font-size: clamp(11px, .82vw, 12px) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     min-width: 0 !important;
   }
   /* İkon gercekte <img>/<svg> DEGIL, mask-image ile boyanan bir <span>.
-   * Bu span'a sabit boyut verilmiyordu; ustteki `img, svg` kurali hicbir
-   * zaman eslesmiyordu (asagida hala duruyor, baska bir surumde
-   * <img>/<svg> kullanilirsa diye zararsiz). Asil ikonu simdi acikca
-   * hedefliyoruz ve `flex-shrink: 0` ile metin dar alanda onu asla
-   * sikistiramaz hale getiriyoruz. */
-  [data-mj="header-nav-item"] > a > span:first-child {
-    width: clamp(18px, 1.45vw, 25px) !important;
-    height: clamp(18px, 1.45vw, 25px) !important;
-    flex-shrink: 0 !important;
-  }
+   * Platformun kendi `margin-right: 8px`'i gap'in ustune biniyordu,
+   * sifirlaniyor. */
+  [data-mj="header-nav-item"] > a > span:first-child,
   [data-mj="header-nav-item"] img,
   [data-mj="header-nav-item"] svg {
-    width: clamp(18px, 1.45vw, 25px) !important;
-    height: clamp(18px, 1.45vw, 25px) !important;
-    flex-shrink: 0 !important;
+    width: clamp(16px, 1.3vw, 19px) !important;
+    height: clamp(16px, 1.3vw, 19px) !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+  }
+}
+/* 621-1239px: 12 oge + "Daha Fazla" butonu bu genislige tek satir sigmiyor;
+ * sikistirmak yerine ikonlari gizleyip seridi yatay kaydirilabilir yapiyoruz.
+ * Boylece etiketler ASLA "..." ile kirpilmiyor. */
+@media (min-width: 621px) and (max-width: 1239px) {
+  [data-mj="header-nav-list"] > ul {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  [data-mj="header-nav-list"] > ul::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+  [data-mj="header-nav-item"] { flex: 0 0 auto !important; }
+  [data-mj="header-nav-item"] > a > span:first-child,
+  [data-mj="header-nav-item"] img,
+  [data-mj="header-nav-item"] svg { display: none !important; }
+  [data-mj="header-nav-item"] > a,
+  [data-mj="header-nav-item"] > button,
+  [data-mj="header-nav-item"] > span,
+  [data-mj="header-nav-item"] > div {
+    gap: 0 !important;
+    padding-inline: clamp(6px, .9vw, 14px) !important;
   }
 }
 /* ---------------- TABLET ---------------- */
