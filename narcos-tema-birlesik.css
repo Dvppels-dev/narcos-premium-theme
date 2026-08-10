@@ -1295,6 +1295,50 @@ footer::before,
     min-height: 0 !important;
     overflow: visible !important;
   }
+  /* OYUN KARESI GUVENLIK AGI — sinif gelmese bile dikey ve ekran boyu.
+   *
+   * Saglayicinin oyunu MASAUSTU mu MOBIL mi cizecegi tamamen bizim iframe'in
+   * en-boy oranindan belirleniyor. Kanit: platformun sarmalayici sayfasi
+   * (/api/rgs) kendi site.css'inde `iframe { position:fixed; inset:0;
+   * width:100%; height:100% }` diyor — yani saglayicinin gordugu viewport
+   * BIREBIR bizim iframe kutumuz. Kutu yatay olursa oyun yatay/masaustu
+   * arayuzunu aciyor.
+   *
+   * Ustteki kural oyun sayfasinda main'i `height:auto` yapiyor; platformun
+   * oyun sayfasi ise `height:100%` zincirine dayaniyor, sonuc: TUM zincir
+   * 0px'e cokuyor (olculdu: main 375x0, iframe 375x0). Tam ekran duzen
+   * yalnizca JS'in ekledigi .ng-game-embed sinifina bagliydi; sinif gec
+   * gelirse veya hic gelmezse oyun bozuk kutuda aciliyordu.
+   *
+   * Asagisi ayni duzeni SINIFTAN BAGIMSIZ kuruyor. Panel gommesi
+   * (data-ng-panel) disarida tutuluyor; iframe icermeyen sayfalar
+   * `:has()` eslesmedigi icin hic etkilenmiyor. */
+  html:not(.ng-game-embed):not(.ng-sports-route)
+  main[data-mj="page-content"]:has(iframe:not([data-ng-panel])) {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  /* iframe'e giden butun ara katmanlar uzasin. */
+  main[data-mj="page-content"] *:has(iframe:not([data-ng-panel])) {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  main[data-mj="page-content"] iframe:not([data-ng-panel]) {
+    position: relative !important;
+    inset: auto !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    border: 0 !important;
+  }
   [data-mj="widget-multi-banner"] { width: 100% !important; padding-inline: 12px !important; box-sizing: border-box !important; }
   [data-mj="widget-multi-banner-slider"] {
     width: 100% !important;
