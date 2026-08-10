@@ -986,6 +986,10 @@ footer::before,
     padding-inline: clamp(18px, 4.5vw, 94px) !important;
     box-sizing: border-box !important;
   }
+  /* Nav seridi ust satirla ayni 4.5vw yan boslugu kullaniyordu; 1920px'te
+   * bu tek basina 173px yiyor ve 12 menu ogesi icin yer kalmiyordu.
+   * Serit, logo/buton satirindan daha dar bir yan bosluk kullansin. */
+  [data-mj="header-nav-list"] { padding-inline: clamp(10px, 1.4vw, 40px) !important; }
   [aria-label="site-header"] { display: flex !important; align-items: center !important; }
   [data-mj="header-left"] { order: 1; flex: 0 0 auto !important; max-width: 245px !important; }
   [data-mj="header-center"] { order: 2; flex: 1 1 auto !important; min-width: 0 !important; }
@@ -996,40 +1000,74 @@ footer::before,
     margin-left: clamp(6px, .6vw, 12px) !important;
   }
   [data-mj="header-nav-list"] > ul { display: flex !important; width: 100% !important; }
-  [data-mj="header-nav-item"] { flex: 1 1 auto !important; min-width: 0 !important; }
-  [data-mj="header-nav-item"] > a {
-    gap: clamp(5px, .55vw, 10px) !important;
-    padding-inline: clamp(7px, .85vw, 15px) !important;
-    /* Guvenlik agi: %100 disi Windows olcegi (125%/150%) Chromium'da
-     * alt-piksel yuvarlamasina yol aciyor ve zaten dar olan bosluk
-     * eriyip ikonla yazi cakisiyormus gibi gorunuyordu — sayisal
-     * degerler dogru olsa bile. `overflow: hidden` bu durumda metni
-     * TASIRMAK yerine KIRPAR; cakismak yerine "..." gorunur. */
+  [data-mj="header-nav-item"] { flex: 1 1 auto !important; min-width: 0 !important; padding-right: 0 !important; }
+  /* ASIL HATA BURADAYDI: <li> `flex: 1 1 auto` ile iceriginin altina
+   * kadar kuculebiliyor, ama icindeki <a> hicbir genislik kisitina
+   * bagli degildi — kendi dogal genisliginde kalip <li>'sini SAGA
+   * DOGRU TASIYORDU. Tasan <a>, komsu ogenin ikonunun uzerine biniyor
+   * ve "ikon yazinin ustune binmis" gorunumu olusuyordu. Onceki
+   * `overflow: hidden` guvenlik agi ise ise yaramiyordu: tasan kutu
+   * <a>'nin KENDISI, icerigi degildi.
+   * Cozum: <a> her kosulda <li>'sinin genisligine kilitli. */
+  [data-mj="header-nav-item"] > a,
+  [data-mj="header-nav-item"] > button,
+  [data-mj="header-nav-item"] > span,
+  [data-mj="header-nav-item"] > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    gap: clamp(3px, .35vw, 5px) !important;
+    padding-inline: clamp(4px, .5vw, 8px) !important;
     overflow: hidden !important;
   }
+  /* Ust sinirlar 1440px'te sabitleniyor: kapsayici 1400px'te duruyor ama
+   * vw'ye bagli deger buyumeye devam edince genis ekranda yazi tasiyordu. */
   [data-mj="header-nav-item"] p {
-    font-size: clamp(12px, .92vw, 16px) !important;
+    font-size: clamp(11px, .82vw, 12px) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     min-width: 0 !important;
   }
   /* İkon gercekte <img>/<svg> DEGIL, mask-image ile boyanan bir <span>.
-   * Bu span'a sabit boyut verilmiyordu; ustteki `img, svg` kurali hicbir
-   * zaman eslesmiyordu (asagida hala duruyor, baska bir surumde
-   * <img>/<svg> kullanilirsa diye zararsiz). Asil ikonu simdi acikca
-   * hedefliyoruz ve `flex-shrink: 0` ile metin dar alanda onu asla
-   * sikistiramaz hale getiriyoruz. */
-  [data-mj="header-nav-item"] > a > span:first-child {
-    width: clamp(18px, 1.45vw, 25px) !important;
-    height: clamp(18px, 1.45vw, 25px) !important;
-    flex-shrink: 0 !important;
-  }
+   * Platformun kendi `margin-right: 8px`'i gap'in ustune biniyordu,
+   * sifirlaniyor. */
+  [data-mj="header-nav-item"] > a > span:first-child,
   [data-mj="header-nav-item"] img,
   [data-mj="header-nav-item"] svg {
-    width: clamp(18px, 1.45vw, 25px) !important;
-    height: clamp(18px, 1.45vw, 25px) !important;
-    flex-shrink: 0 !important;
+    width: clamp(16px, 1.3vw, 19px) !important;
+    height: clamp(16px, 1.3vw, 19px) !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+  }
+}
+/* 621-1239px: 12 oge + "Daha Fazla" butonu bu genislige tek satir sigmiyor;
+ * sikistirmak yerine ikonlari gizleyip seridi yatay kaydirilabilir yapiyoruz.
+ * Boylece etiketler ASLA "..." ile kirpilmiyor. */
+@media (min-width: 621px) and (max-width: 1239px) {
+  [data-mj="header-nav-list"] > ul {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  [data-mj="header-nav-list"] > ul::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+  [data-mj="header-nav-item"] { flex: 0 0 auto !important; }
+  [data-mj="header-nav-item"] > a > span:first-child,
+  [data-mj="header-nav-item"] img,
+  [data-mj="header-nav-item"] svg { display: none !important; }
+  [data-mj="header-nav-item"] > a,
+  [data-mj="header-nav-item"] > button,
+  [data-mj="header-nav-item"] > span,
+  [data-mj="header-nav-item"] > div {
+    gap: 0 !important;
+    padding-inline: clamp(6px, .9vw, 14px) !important;
   }
 }
 /* ---------------- TABLET ---------------- */
@@ -1257,12 +1295,74 @@ footer::before,
     min-height: 0 !important;
     overflow: visible !important;
   }
+  /* OYUN KARESI GUVENLIK AGI — sinif gelmese bile dikey ve ekran boyu.
+   *
+   * Saglayicinin oyunu MASAUSTU mu MOBIL mi cizecegi tamamen bizim iframe'in
+   * en-boy oranindan belirleniyor. Kanit: platformun sarmalayici sayfasi
+   * (/api/rgs) kendi site.css'inde `iframe { position:fixed; inset:0;
+   * width:100%; height:100% }` diyor — yani saglayicinin gordugu viewport
+   * BIREBIR bizim iframe kutumuz. Kutu yatay olursa oyun yatay/masaustu
+   * arayuzunu aciyor.
+   *
+   * Ustteki kural oyun sayfasinda main'i `height:auto` yapiyor; platformun
+   * oyun sayfasi ise `height:100%` zincirine dayaniyor, sonuc: TUM zincir
+   * 0px'e cokuyor (olculdu: main 375x0, iframe 375x0). Tam ekran duzen
+   * yalnizca JS'in ekledigi .ng-game-embed sinifina bagliydi; sinif gec
+   * gelirse veya hic gelmezse oyun bozuk kutuda aciliyordu.
+   *
+   * Asagisi ayni duzeni SINIFTAN BAGIMSIZ kuruyor. Panel gommesi
+   * (data-ng-panel) disarida tutuluyor; iframe icermeyen sayfalar
+   * `:has()` eslesmedigi icin hic etkilenmiyor. */
+  html:not(.ng-game-embed):not(.ng-sports-route)
+  main[data-mj="page-content"]:has(iframe:not([data-ng-panel])) {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  /* iframe'e giden butun ara katmanlar uzasin. */
+  main[data-mj="page-content"] *:has(iframe:not([data-ng-panel])) {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  main[data-mj="page-content"] iframe:not([data-ng-panel]) {
+    position: relative !important;
+    inset: auto !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    border: 0 !important;
+    /* ILK KARE DIKEY OLMAK ZORUNDA.
+     *
+     * Saglayici (Playson/Pragmatic) duzenini oyun YUKLENIRKENKI viewport'a
+     * gore secip kilitliyor; kutu sonradan buyuyunce yeniden duzenlemiyor.
+     * Olculen zaman cizelgesi (375x812, /tr/game/demo/178885):
+     *     296ms  iframe src ILE BIRLIKTE dogdu -> 375x339  oran 1.11 YATAY
+     *    1024ms  hala                            375x339  oran 1.11 YATAY
+     *    1975ms  ancak simdi                     375x659  oran 0.57 portre
+     * Yani oyun ilk ~1.9sn'yi yatay bir kutuda gecirip yatay/masaustu
+     * arayuzu secmis oluyordu; sonraki duzelme ise yaramiyor.
+     *
+     * `min-height` zemini bu pencereyi tamamen kapatiyor: ilk kareden
+     * itibaren kutu dikey. 68svh, 320px'den genis her telefonda
+     * yukseklik > genislik garantisi verir (0.68 * 568 = 386 > 320);
+     * cihaz gercekten yatay tutuluyorsa dogru sekilde yatay kalir. */
+    min-height: 68svh !important;
+  }
   [data-mj="widget-multi-banner"] { width: 100% !important; padding-inline: 12px !important; box-sizing: border-box !important; }
   [data-mj="widget-multi-banner-slider"] {
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
-    aspect-ratio: 16 / 7 !important;
+    /* Banner gorselleri 882x392 = 9/4 (2.25). Kutu 16/7 (2.2857) idi:
+     * `object-fit: contain` gorseli yukseklige sigdirip iki yanda ~2.75px
+     * siyah bant birakiyordu. Oran gorselle birebir olunca bant kalmiyor. */
+    aspect-ratio: 9 / 4 !important;
     border-radius: 16px !important;
   }
   [data-mj="widget-multi-banner-slider"] > * { flex: 0 0 100% !important; width: 100% !important; height: 100% !important; }
@@ -1794,7 +1894,9 @@ html:not(.ng-sports-route) #sportsbook-wrapper {
   [data-mj="widget-collection-slider-item"] img {
     width: 100% !important;
     height: auto !important;
-    aspect-ratio: 2.05 / 1 !important;
+    /* Masaustu kuraliyla ayni olsun: gorseller 592x288 (2.0556).
+     * 2.05/1 yuvarlamasi cover ile ustten/alttan tirasliyordu. */
+    aspect-ratio: 592 / 288 !important;
   }
 }
 
