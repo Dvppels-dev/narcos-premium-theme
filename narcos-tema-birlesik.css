@@ -1336,8 +1336,23 @@ footer::before,
     flex: 1 1 auto !important;
     width: 100% !important;
     height: auto !important;
-    min-height: 0 !important;
     border: 0 !important;
+    /* ILK KARE DIKEY OLMAK ZORUNDA.
+     *
+     * Saglayici (Playson/Pragmatic) duzenini oyun YUKLENIRKENKI viewport'a
+     * gore secip kilitliyor; kutu sonradan buyuyunce yeniden duzenlemiyor.
+     * Olculen zaman cizelgesi (375x812, /tr/game/demo/178885):
+     *     296ms  iframe src ILE BIRLIKTE dogdu -> 375x339  oran 1.11 YATAY
+     *    1024ms  hala                            375x339  oran 1.11 YATAY
+     *    1975ms  ancak simdi                     375x659  oran 0.57 portre
+     * Yani oyun ilk ~1.9sn'yi yatay bir kutuda gecirip yatay/masaustu
+     * arayuzu secmis oluyordu; sonraki duzelme ise yaramiyor.
+     *
+     * `min-height` zemini bu pencereyi tamamen kapatiyor: ilk kareden
+     * itibaren kutu dikey. 68svh, 320px'den genis her telefonda
+     * yukseklik > genislik garantisi verir (0.68 * 568 = 386 > 320);
+     * cihaz gercekten yatay tutuluyorsa dogru sekilde yatay kalir. */
+    min-height: 68svh !important;
   }
   [data-mj="widget-multi-banner"] { width: 100% !important; padding-inline: 12px !important; box-sizing: border-box !important; }
   [data-mj="widget-multi-banner-slider"] {
